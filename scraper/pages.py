@@ -16,7 +16,7 @@ from .models import Event
 from .reports import describe
 
 PACIFIC = ZoneInfo("America/Los_Angeles")
-STATIC = ["", "about.html", "stats.html"]
+STATIC = ["", "about.html", "ai.html", "stats.html"]
 
 
 def h(s: str | None) -> str:

@@ -145,6 +145,13 @@ def check_about(page: Page, base: str, size: str, errors: list[str]) -> None:
     no_sideways_scroll(page, f"about ({size})", errors)
 
 
+def check_ai(page: Page, base: str, size: str, errors: list[str]) -> None:
+    open_page(page, f"{base}/ai.html", errors)
+    if page.locator(".ai .copy").count() != page.locator(".ai pre").count():
+        errors.append(f"ai ({size}): a command has no Copy button")
+    no_sideways_scroll(page, f"ai ({size})", errors)
+
+
 def check_stats(page: Page, base: str, size: str, errors: list[str]) -> None:
     open_page(page, f"{base}/stats.html", errors)
     page.wait_for_selector("#by-source .bar", timeout=10_000)
@@ -169,7 +176,7 @@ def main(previous: Path | None) -> int:
     with sync_playwright() as p:
         browser = p.chromium.launch()
         for size, (w, h) in VIEWPORTS.items():
-            for check in (check_events, check_about, check_stats):
+            for check in (check_events, check_about, check_ai, check_stats):
                 page = browser.new_page(viewport={"width": w, "height": h})
                 try:
                     check(page, base, size, errors)
