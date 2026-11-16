@@ -44,25 +44,17 @@ function relTime(iso) {
   return `${Math.round(mins / 1440)} days ago`;
 }
 
-// GoatCounter's public counter: one JSON file per page path, "TOTAL" for the whole site.
-async function views(path) {
-  const res = await fetch(`${GOATCOUNTER}/counter/${encodeURIComponent(path)}.json`);
-  if (!res.ok) throw new Error(`goatcounter ${res.status}`);
-  return (await res.json()).count;
-}
-
 async function traffic() {
   // GoatCounter neither counts nor answers a local copy of the site.
   if (/^(localhost|127\.|\[::1\])/.test(location.hostname)) {
     $("#traffic").innerHTML = `<p class="note">Visitor counts show on the live site.</p>`;
     return;
   }
-  const base = location.pathname.replace(/[^/]*$/, "");
-  const pages = [["TOTAL", "Visits, all pages"], [base, "Events page"], [`${base}about.html`, "How it works"],
-    [`${base}stats.html`, "This page"]];
   try {
-    const counts = await Promise.all(pages.map(([p]) => views(p).catch(() => "0")));
-    $("#traffic").replaceChildren(...pages.map(([, label], i) => tile(counts[i], label)));
+    // GoatCounter's public counter; "TOTAL" covers every page.
+    const res = await fetch(`${GOATCOUNTER}/counter/TOTAL.json`);
+    if (!res.ok) throw new Error(`goatcounter ${res.status}`);
+    $("#traffic").replaceChildren(tile((await res.json()).count, "Visits"));
   } catch {
     $("#traffic").innerHTML = `<p class="note">Visitor counts aren't available yet.</p>`;
   }
