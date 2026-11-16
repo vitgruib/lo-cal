@@ -96,7 +96,6 @@ def event_page(e: Event, site_url: str) -> str:
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="../event.css">
   <script type="application/ld+json">{_json_ld(e, page)}</script>
-  <script data-goatcounter="https://lo-cal.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
   <header class="masthead">

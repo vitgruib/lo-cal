@@ -1,7 +1,6 @@
 "use strict";
 
 const TZ = "America/Los_Angeles";
-const GOATCOUNTER = "https://lo-cal.goatcounter.com";
 const $ = (s) => document.querySelector(s);
 const dayKey = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" });
 const fmtDay = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", weekday: "short", month: "short", day: "numeric" });
@@ -42,22 +41,6 @@ function relTime(iso) {
   if (mins < 60) return `${Math.max(mins, 1)} min ago`;
   if (mins < 48 * 60) return `${Math.round(mins / 60)} h ago`;
   return `${Math.round(mins / 1440)} days ago`;
-}
-
-async function traffic() {
-  // GoatCounter neither counts nor answers a local copy of the site.
-  if (/^(localhost|127\.|\[::1\])/.test(location.hostname)) {
-    $("#traffic").innerHTML = `<p class="note">Visitor counts show on the live site.</p>`;
-    return;
-  }
-  try {
-    // GoatCounter's public counter; "TOTAL" covers every page.
-    const res = await fetch(`${GOATCOUNTER}/counter/TOTAL.json`);
-    if (!res.ok) throw new Error(`goatcounter ${res.status}`);
-    $("#traffic").replaceChildren(tile((await res.json()).count, "Visits"));
-  } catch {
-    $("#traffic").innerHTML = `<p class="note">Visitor counts aren't available yet.</p>`;
-  }
 }
 
 async function events() {
@@ -102,7 +85,6 @@ async function events() {
   }));
 }
 
-traffic();
 events().catch((err) => {
   console.error(err);
   $("#totals").innerHTML = `<p class="note">Couldn't load events.json. Refresh to try again.</p>`;

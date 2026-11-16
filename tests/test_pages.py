@@ -62,7 +62,7 @@ def test_hostile_event_text_cannot_inject_markup(tmp_path):
     html = (tmp_path / "e" / f"{e.id}.html").read_text()
     head = read(tmp_path / "e" / f"{e.id}.html")
 
-    assert len(re.findall(r"<script", html)) == 2  # the JSON-LD block and the counter
+    assert len(re.findall(r"<script", html)) == 1  # the JSON-LD block only
     assert "<img" not in html
     assert json.loads(head.ld)["description"] == "</script><img src=x onerror=alert(1)>"
 
