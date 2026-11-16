@@ -12,9 +12,14 @@ Tags (`tags`), area (`region`), `free` and `access` ("getting in") come from det
   - [today.txt](https://vitgruib.github.io/lo-cal/data/llms/today.txt), [tomorrow.txt](https://vitgruib.github.io/lo-cal/data/llms/tomorrow.txt), [weekend.txt](https://vitgruib.github.io/lo-cal/data/llms/weekend.txt)
   - `data/llms/days/YYYY-MM-DD.txt`: one file per day
   - `data/llms/topics/<topic>.txt`: the next 7 days of one topic, e.g. [free-food.txt](https://vitgruib.github.io/lo-cal/data/llms/topics/free-food.txt), `hackathons.txt`, `ai-tech.txt`, `talks.txt`, `social.txt`, `career.txt`, `startups.txt`, `arts-music.txt`, `sports-wellness.txt`, `community.txt`
+- `data/json/`: the same slices as JSON (`today.json`, `tomorrow.json`, `weekend.json`, `days/YYYY-MM-DD.json`, `topics/<topic>.json`), each `{generated_at, title, events}` with the `events.json` fields below except `image`, `source_tags` and `source_access`. Use these when you parse rather than read.
 - [llms-full.txt](https://vitgruib.github.io/lo-cal/data/llms-full.txt): every upcoming event in one file, one line each, grouped by day. It is large (about 500 KB), so many assistants' web tools cut it off; prefer the slices above.
 - [events.json](https://vitgruib.github.io/lo-cal/data/events.json): the same events as JSON, plus the list of sources and their health.
 - [Calendar feeds](https://vitgruib.github.io/lo-cal/data/cal/all.ics): `data/cal/all.ics` and one per type, e.g. `free-food.ics`, `hackathons.ics`, `ai-tech.ics`, `talks.ics`, `social.ics`, `career.ics`, `startups.ics`, `arts-music.ics`, `sports-wellness.ics`, `community.ics`.
+
+## MCP server
+
+For MCP clients (Claude Desktop, Cursor, local-model apps): `uvx --from "git+https://github.com/vitgruib/lo-cal#subdirectory=mcp-server" lo-cal-mcp` gives `search_events` and `get_event` tools. Setup: https://github.com/vitgruib/lo-cal/tree/main/mcp-server
 
 ## events.json fields
 

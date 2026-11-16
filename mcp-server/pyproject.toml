@@ -1,0 +1,16 @@
+[project]
+name = "lo-cal-mcp"
+version = "0.1.0"
+description = "MCP server for Lo-Cal, Berkeley's open event calendar"
+requires-python = ">=3.12"
+dependencies = ["httpx>=0.28.1", "mcp>=2.3.0"]
+
+[project.scripts]
+lo-cal-mcp = "lo_cal_mcp.server:main"
+
+[dependency-groups]
+dev = ["pytest>=9.2.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
