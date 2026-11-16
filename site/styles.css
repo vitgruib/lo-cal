@@ -27,7 +27,7 @@
   --wrap: 1240px;
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --display: var(--serif);
-  --body: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --body: "Schibsted Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --head-h: 69px;  /* the sticky header: 4px gold bar + 64px row + 1px line */
   color-scheme: light;
 }
@@ -78,7 +78,7 @@ svg { flex: none; }
 .subbar { background: var(--surface); border-bottom: 1px solid var(--line); }
 .subbar-in { display: grid; grid-template-columns: 172px minmax(0, 1fr) auto; align-items: center; gap: 28px; padding-top: 16px; padding-bottom: 16px; }
 .place { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.4; }
-.place b { display: block; color: var(--title); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.place b { display: block; color: var(--title); font-size: 13px; font-weight: 600; }
 .search { display: flex; align-items: center; gap: 10px; min-width: 0; border: 1px solid var(--faint); border-radius: 10px; padding: 4px 4px 4px 14px; background: var(--surface); }
 .search:focus-within { border-color: var(--navy); box-shadow: 0 0 0 3px color-mix(in srgb, var(--navy) 12%, transparent); }
 .search > svg { width: 18px; height: 18px; fill: none; stroke: var(--muted); stroke-width: 2; }
@@ -101,7 +101,6 @@ svg { flex: none; }
 .iconbtn:disabled { opacity: .4; cursor: default; }
 .iconbtn.plain { border: 0; background: none; font-size: 16px; }
 .arrow-link, .arrow-out { font: 600 12.5px var(--body); color: var(--title); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
-.arrow-link::after { content: " →"; }
 .arrow-out::after { content: " ↗"; font-size: .9em; }
 .arrow-link:hover, .arrow-out:hover { text-decoration: underline; }
 
@@ -126,7 +125,7 @@ svg { flex: none; }
 .side-head .link { text-decoration: none; font-size: 12px; }
 .side-close { display: none; }
 .fgroup { margin-bottom: 20px; }
-.fgroup h3 { margin: 0 0 8px; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
+.fgroup h3 { margin: 0 0 8px; font-size: 13px; font-weight: 600; color: var(--ink); }
 .whenlist { display: grid; gap: 2px; }
 .whenlist button { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; font: 500 13px var(--body); color: var(--ink-2); background: none; border: 0; border-radius: 6px; padding: 7px 8px; cursor: pointer; }
 .whenlist button:hover { background: var(--chip); }
@@ -190,21 +189,20 @@ svg { flex: none; }
 .day { display: flex; align-items: baseline; gap: 10px; margin: 30px 0 4px; padding-top: 14px; border-top: 1px solid var(--line); }
 .day h2 { margin: 0; font: 500 26px/1.1 var(--serif); letter-spacing: -0.02em; color: var(--ink); }
 .day span { color: var(--muted); font-size: 12.5px; }
-.section { display: flex; align-items: center; gap: 8px; margin: 22px 0 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
-.section .n { color: var(--muted); font-weight: 500; letter-spacing: 0; }
+.section { display: flex; align-items: baseline; gap: 8px; margin: 26px 0 2px; font: italic 500 17px/1.2 var(--serif); color: var(--ink-2); }
+.section .n { color: var(--muted); font: 400 12px var(--body); }
 .section.now { color: var(--green); }
-.section.now::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+.section.now::before { content: ""; align-self: center; width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-out infinite; }
 
 .card {
   position: relative; display: grid; grid-template-columns: 84px minmax(0, 1fr) auto auto; gap: 0 18px;
-  background: var(--surface); border: 1px solid var(--faint); border-radius: var(--radius);
-  padding: 18px 16px 16px 18px; margin-bottom: 12px; box-shadow: var(--shadow);
+  padding: 18px 4px 16px 12px; border-bottom: 1px solid var(--line); background: var(--bg);
+  view-transition-name: var(--vt, none); view-transition-class: card;
 }
-.card.now { border-color: color-mix(in srgb, var(--navy) 45%, var(--faint)); box-shadow: 0 0 0 1px color-mix(in srgb, var(--navy) 20%, transparent); }
+.card.now { box-shadow: inset 3px 0 0 var(--green); }
 .card:has(.addcal[open]) { z-index: 5; }
 .time { font-weight: 700; font-size: 13.5px; color: var(--ink); padding-top: 2px; }
 .time small { display: block; color: var(--muted); font-weight: 400; font-size: 12px; margin-top: 2px; }
-.live-pill { display: inline-block; white-space: nowrap; margin-top: 8px; padding: 2px 7px; border-radius: 5px; background: var(--green-soft); color: var(--green); font-size: 10.5px; font-weight: 500; }
 .body { min-width: 0; }
 .title { color: var(--title); text-decoration: none; font: 500 17px/1.3 var(--body); letter-spacing: -0.01em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .title[href]::after { content: " ↗"; font-size: .8em; }
@@ -218,28 +216,30 @@ svg { flex: none; }
 .desc:empty { display: none; }
 .badges { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; }
 .badges:empty { display: none; }
-.badge { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 5px; background: var(--chip); color: var(--ink-2); }
-.badge.food { background: var(--gold-soft); color: var(--gold-ink); }
-.via { font-size: 11px; color: var(--muted); }
+.badges { gap: 4px 0; }
+.badge { font-size: 12px; font-weight: 500; color: var(--ink-2); }
+.badge + .badge::before { content: "·"; margin: 0 7px; color: var(--muted); }
+.badge.food { color: #a8741a; font-weight: 600; }
+.via { flex-basis: 100%; font-size: 12px; color: var(--muted); }
 .via a { color: inherit; text-decoration: none; }
 .via a:hover { color: var(--ink); text-decoration: underline; }
 .thumb { width: 74px; height: 70px; object-fit: cover; border-radius: 6px; background: var(--chip); align-self: start; }
 .thumb:not([src]) { display: none; }
 /* Save, Calendar and Report share one secondary-button style; only a saved event is tinted. */
-.card .actions { grid-column: 4; grid-row: 1; display: flex; flex-direction: column; gap: 6px; width: 112px; }
+.card .actions { grid-column: 2; grid-row: 2; display: flex; gap: 18px; margin-top: 10px; }
 .save, .calbtn, .flag {
-  list-style: none; display: flex; align-items: center; gap: 7px; width: 100%; height: 32px; padding: 0 10px;
-  font: 500 12.5px/1 var(--body); color: var(--ink-2); text-decoration: none; white-space: nowrap; cursor: pointer;
-  background: var(--surface); border: 1px solid var(--faint); border-radius: 7px;
+  list-style: none; display: flex; align-items: center; gap: 5px; padding: 2px 0;
+  font: 500 12.5px/1 var(--body); color: var(--muted); text-decoration: none; white-space: nowrap; cursor: pointer;
+  background: none; border: 0;
 }
 .save svg, .calbtn svg, .flag svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
-.save:hover, .calbtn:hover, .flag:hover, .addcal[open] .calbtn { background: var(--chip); color: var(--ink); }
-.save[aria-pressed="true"] { background: var(--gold-soft); border-color: var(--gold-line); color: var(--gold-ink); }
+.save:hover, .calbtn:hover, .flag:hover, .addcal[open] .calbtn { color: var(--ink); }
+.save[aria-pressed="true"] { color: #a8741a; }
 .save[aria-pressed="true"] svg { fill: currentColor; }
 .addcal { position: relative; }
 .calbtn::-webkit-details-marker { display: none; }
 .calmenu {
-  position: absolute; right: 0; top: calc(100% + 4px); z-index: 3; min-width: 210px;
+  position: absolute; left: 0; top: calc(100% + 4px); z-index: 3; min-width: 210px;
   display: flex; flex-direction: column; padding: 4px;
   background: var(--surface); border: 1px solid var(--faint); border-radius: 8px; box-shadow: 0 8px 24px rgb(14 19 33 / 14%);
 }
@@ -252,14 +252,13 @@ svg { flex: none; }
 .card.row .time { font-weight: 500; padding: 0; }
 .card.row .desc, .card.row .badges, .card.row .thumb { display: none; }
 .card.row .where { margin-top: 3px; }
-.card.row .actions { grid-column: 3; flex-direction: row; align-items: center; width: auto; }
-.card.row .actions > * { width: auto; }
+.card.row .actions { grid-column: 3; grid-row: 1; margin-top: 0; }
 
 /* Today's ended events, tucked away under one line. */
 .earlier { margin: 18px 0 10px; }
 .earlier > summary {
   list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-2);
-  border: 1px solid var(--faint); border-radius: var(--radius); background: var(--surface); padding: 12px 16px;
+  border-bottom: 1px solid var(--line); padding: 14px 4px 14px 12px;
 }
 .earlier > summary::-webkit-details-marker { display: none; }
 .earlier > summary::before { content: "›"; font-size: 16px; color: var(--muted); transition: transform .15s; }
@@ -368,15 +367,12 @@ svg { flex: none; }
   .view-title h1 { font-size: 30px; }
   .view-nav { width: 100%; padding-top: 4px; }
   .view-nav .iconbtn:first-of-type { margin-left: auto; }
-  .card { grid-template-columns: 76px minmax(0, 1fr); gap: 0 10px; padding: 14px; }
+  .card { grid-template-columns: 76px minmax(0, 1fr); gap: 0 10px; padding: 14px 2px 14px 10px; }
   .time { font-size: 13px; }
-  .live-pill { white-space: normal; }
   .thumb { display: none; }
-  .card .actions, .card.row .actions { grid-column: 1 / -1; grid-row: auto; flex-direction: row; width: auto; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
-  .card .actions > * { flex: 1; width: auto; }
-  .save, .calbtn, .flag { justify-content: center; height: 36px; }
+  .card .actions, .card.row .actions { grid-column: 2; grid-row: auto; gap: 22px; margin-top: 10px; }
+  .save, .calbtn, .flag { height: 30px; }
   .card.row { grid-template-columns: 76px minmax(0, 1fr); }
-  .card.row .actions { grid-column: 1 / -1; justify-content: flex-end; }
   .cal-banner { flex-wrap: wrap; }
   .cal-banner .btn { margin-left: 0; width: 100%; }
   .foot-row .updated { margin-left: 0; }
@@ -385,7 +381,7 @@ svg { flex: none; }
 
 /* Big-venue concerts (sources/big_shows.py): a poster, a display-size title and the train line
    up front, so a show worth the trip stands out from the list around it. */
-.card.big { border: 1.5px solid var(--big); box-shadow: inset 4px 0 0 var(--big); }
+.card.big { border: 1.5px solid var(--big); border-radius: var(--radius); box-shadow: inset 4px 0 0 var(--big); margin: 8px 0; }
 .card.big .time { color: var(--big); }
 .kicker { display: block; margin-bottom: 4px; color: var(--big); font: 700 11px/1.2 var(--body); letter-spacing: .08em; text-transform: uppercase; }
 .card.big .title { font: 600 22px/1.15 var(--serif); -webkit-line-clamp: 3; }
@@ -434,7 +430,7 @@ svg { flex: none; }
 .live.degraded::before, .live.failing::before { background: var(--gold); }
 .live.down::before { background: #d64545; }
 .facts { display: grid; grid-template-columns: 76px 1fr; gap: 6px 12px; margin: 2px 0 0; padding: 0 14px 4px 35px; font-size: 14px; }
-.facts dt { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+.facts dt { font-size: 13px; font-weight: 600; color: var(--muted); }
 .facts dd { margin: 0; color: color-mix(in srgb, var(--ink) 80%, var(--muted)); }
 .facts ol.found { margin: 2px 0 0; padding-left: 18px; }
 .facts ol.found li { margin: 2px 0; font-size: 14px; }
@@ -464,3 +460,46 @@ svg { flex: none; }
 .health th { color: var(--muted); font-weight: 600; }
 .health .num { text-align: right; font-variant-numeric: tabular-nums; }
 .health tr:not([data-health="ok"]) td:nth-child(2) { font-weight: 600; }
+
+/* ---------- Motion ---------- */
+/* Pages: the header holds still while the content under it slides up. */
+@view-transition { navigation: auto; }
+.masthead { view-transition-name: masthead; }
+::view-transition-old(root) { animation: .18s ease-in both fade-out; }
+::view-transition-new(root) { animation: .32s cubic-bezier(.2, .8, .2, 1) both rise; }
+/* Inside the events page, everything but the list swaps at once: a cross-fade doubles the sidebar text. */
+html[data-vt]::view-transition-old(root), html[data-vt]::view-transition-new(root) { animation: none; }
+
+/* Filter changes (app.js update): cards that stay glide to their new place, new ones rise in. */
+::view-transition-group(*.card) { animation-duration: .38s; animation-timing-function: cubic-bezier(.2, .8, .2, 1); }
+::view-transition-new(*.card):only-child { animation: .32s cubic-bezier(.2, .8, .2, 1) .12s both rise; }
+::view-transition-old(*.card):only-child { animation: .15s ease-in both fade-out; }
+.card.enter { animation: .4s cubic-bezier(.2, .8, .2, 1) calc(var(--i) * 35ms) both rise; }
+
+/* Day steps (‹ ›): the list turns like a calendar page. */
+html[data-vt="next"] .card, html[data-vt="prev"] .card { view-transition-name: none; }
+html[data-vt="next"] .main, html[data-vt="prev"] .main { view-transition-name: page; }
+::view-transition-old(page) { animation: .16s ease-in both var(--page-out, page-out-left); }
+::view-transition-new(page) { animation: .34s cubic-bezier(.2, .8, .2, 1) .1s both var(--page-in, page-in-right); }
+html[data-vt="prev"] { --page-out: page-out-right; --page-in: page-in-left; }
+
+/* Card details */
+.time { transition: transform .2s cubic-bezier(.2, .8, .2, 1); transform-origin: left top; }
+.card:hover .time { transform: translateX(3px) rotate(-1.5deg); }
+.card { transition: background-color .2s; }
+.card:hover { background: color-mix(in srgb, var(--surface) 70%, var(--bg)); }
+.save.pop svg { animation: .45s cubic-bezier(.3, 1.6, .5, 1) pop; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes page-out-left { to { opacity: 0; transform: translateX(-40px) rotateY(8deg); } }
+@keyframes page-out-right { to { opacity: 0; transform: translateX(40px) rotateY(-8deg); } }
+@keyframes page-in-right { from { opacity: 0; transform: translateX(60px) rotateY(-8deg); } }
+@keyframes page-in-left { from { opacity: 0; transform: translateX(-60px) rotateY(8deg); } }
+@keyframes pop { 40% { transform: scale(1.45) rotate(-8deg); } }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--green) 55%, transparent); } 100% { box-shadow: 0 0 0 7px transparent; } }
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  *, *::before, ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; transition: none !important; }
+}

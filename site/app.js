@@ -574,7 +574,7 @@ function step(dir) {
   });
   if (named) state.when = named;
   else Object.assign(state, { when: "custom", from: a, to: b });
-  update();
+  update(dir > 0 ? "next" : "prev");
 }
 
 function tick() {
@@ -653,12 +653,15 @@ function renderMore() {
       } else if (it.earlier) {
         const box = document.createElement("details");
         box.className = "earlier";
-        box.innerHTML = `<summary><b>Earlier today</b><small></small><small>Past plans, tucked away.</small></summary>`;
+        box.innerHTML = `<summary><b>Earlier today</b><small></small></summary>`;
         box.querySelector("small").textContent = plural(it.earlier.length, "ended event");
         box.append(...it.earlier.map((e) => card(e)));
         frag.append(box);
       } else {
-        frag.append(card(it.e, it.row));
+        const c = card(it.e, it.row);
+        // Outside a view transition (first load, scrolling for more), cards rise in one after another.
+        if (!document.documentElement.dataset.vt && shown < 12) c.classList.add("enter"), c.style.setProperty("--i", shown);
+        frag.append(c);
         shown++;
       }
     } catch (err) {
@@ -668,7 +671,18 @@ function renderMore() {
   $("#list").append(frag);
 }
 
-function update() {
+// Filter changes reflow the list in place; day steps ("next"/"prev") turn it like a page.
+function update(kind = "reflow") {
+  const root = document.documentElement;
+  if (!document.startViewTransition || !started || matchMedia("(prefers-reduced-motion: reduce)").matches) return draw();
+  root.dataset.vt = kind;
+  document.startViewTransition(draw).finished.finally(() => delete root.dataset.vt);
+}
+
+let started = false;  // the first draw has nothing to transition from
+
+function draw() {
+  started = true;
   writeHash();
   renderControls();
   filtered = base();
@@ -749,7 +763,6 @@ function card(e, row = false) {
   if (e.all_day) time.textContent = "All day";
   else if (e._start < now && e._day < today) time.innerHTML = `Ongoing<small>until ${e.end ? fmtDate.format(new Date(e._end)) : ""}</small>`;
   else time.innerHTML = `${fmtTime.format(new Date(e._start))}${endClock ? `<small>– ${fmtTime.format(new Date(e._end))}</small>` : ""}`;
-  if (live && !row && !untimed(e, today)) time.append(Object.assign(document.createElement("span"), { className: "live-pill", textContent: "Happening now" }));
 
   const a = node.querySelector(".title");
   a.textContent = e.title;
@@ -837,7 +850,13 @@ function card(e, row = false) {
     save.title = on ? "Remove from your Lo-Cal calendar" : "Save to your Lo-Cal calendar";
     tomine.textContent = on ? "✓ In my Lo-Cal calendar" : "Add to my Lo-Cal calendar";
   };
-  save.onclick = tomine.onclick = () => { toggleSave(e.id); showSaved(); };
+  node.style.setProperty("--vt", `e${e.id}`);
+  save.onclick = tomine.onclick = () => {
+    toggleSave(e.id);
+    showSaved();
+    if (saved.has(e.id)) save.classList.add("pop");
+  };
+  save.onanimationend = () => save.classList.remove("pop");
   showSaved();
 
   const end = endOf(e);
@@ -1038,8 +1057,8 @@ function shiftMonth(n) {
 function renderPrefs() {
   const list = [...prefs];
   $("#pref-summary").textContent = list.length
-    ? `${list.join(", ")}. Make discoveries more you.`
-    : "Pick what you're into and sort by it. Make discoveries more you.";
+    ? `${list.join(", ")}.`
+    : "Pick what you're into and sort by it.";
   $("#pref-grid").replaceChildren(...data.topics.map((t) => {
     const row = document.createElement("label");
     row.className = "check";

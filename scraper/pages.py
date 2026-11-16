@@ -92,7 +92,7 @@ def event_page(e: Event, site_url: str) -> str:
   <meta property="og:url" content="{h(page)}">
   <meta property="og:image" content="{h(image)}">
   <meta name="twitter:card" content="summary_large_image">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="../event.css">
   <script type="application/ld+json">{_json_ld(e, page)}</script>

@@ -49,6 +49,8 @@ def no_sideways_scroll(page: Page, where: str, errors: list[str]) -> None:
 
 
 def count(page: Page) -> str:
+    # A filter change redraws inside a view transition, a frame after the click (app.js update).
+    page.wait_for_function("!document.documentElement.dataset.vt")
     return page.locator("#count").inner_text().replace(",", "")
 
 
