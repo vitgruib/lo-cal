@@ -26,6 +26,8 @@ def h(s: str | None) -> str:
 def _summary(e: Event) -> str:
     day = e.start.astimezone(PACIFIC)
     place = e.venue or e.address or ("Online" if e.online else "")
+    if place and e.city and e.city.lower() not in place.lower():
+        place = f"{place}, {e.city}"
     return " · ".join(x for x in [f"{day:%a %b %-d}, {time_range(e)}", place] if x)
 
 
@@ -115,6 +117,8 @@ def event_page(e: Event, site_url: str) -> str:
       </div>
     </header>
   <main class="wrap event-page">
+    <a class="back" href="../">← All events</a>
+    {f'<img class="hero" src="{h(e.image)}" alt="">' if e.image else ""}
     <h1>{h(e.title)}</h1>
     {chr(10).join(facts)}
     <p class="desc-full">{h(e.description)}</p>

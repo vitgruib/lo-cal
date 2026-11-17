@@ -497,15 +497,13 @@ function renderPills() {
   const pills = [];
   if (!state.event) {
     const label = state.when === "custom" ? rangeLabel(...whenRange("custom")) : when;
-    pills.push(state.when === DEFAULT_WHEN
-      ? Object.assign(document.createElement("span"), { className: "qchip", textContent: label })
-      : removable(label, "Back to today", () => { state.when = DEFAULT_WHEN; update(); }));
+    if (state.when !== DEFAULT_WHEN) pills.push(removable(label, "Back to today", () => { state.when = DEFAULT_WHEN; update(); }));
   }
   pills.push(...activeFilters().map(([label, drop]) => removable(label, "Remove this filter", drop)));
   $("#pills").replaceChildren(...pills);
   const regions = [...state.regions];
   const types = [...state.topics].filter((t) => t !== FOOD);
-  $("#scope").textContent = [
+  $("#scope").textContent = !pills.length ? "" : [
     regions.length ? "" : "Anywhere",
     types.length ? "" : "All categories",
   ].filter(Boolean).join(" · ");
@@ -843,13 +841,13 @@ function card(e, row = false) {
     }
     try {
       await navigator.clipboard.writeText(url);
-      share.textContent = "Link copied";
+      share.querySelector("span").textContent = "Link copied";
     } catch {
       // No clipboard access: put the link in the address bar to copy from there.
       history.replaceState(null, "", `#event=${e.id}`);
-      share.textContent = "Link in address bar";
+      share.querySelector("span").textContent = "Link in address bar";
     }
-    setTimeout(() => { share.textContent = "Copy link to event"; }, 1800);
+    setTimeout(() => { share.querySelector("span").textContent = "Share"; }, 1800);
   };
   if (data.forms?.report_prefill) {
     const flag = node.querySelector(".flag");
@@ -1106,9 +1104,9 @@ async function boot() {
   renderPrefs();
 
   $("#updated").textContent = `Updated ${relTime(data.generated_at)}`;
-  const notes = data.sources.filter((s) => s.health !== "ok" && !(s.health === "off" && s.count)).map((s) =>
-    `${s.name} (${s.health === "off" ? "not connected" : `having trouble; showing results from ${s.last_ok ? relTime(s.last_ok) : "earlier"}`})`);
-  $("#status").textContent = notes.length ? `Also: ${notes.join(", ")}.` : "";
+  const notes = data.sources.filter((s) => s.health !== "ok" && s.health !== "off").map((s) =>
+    `${s.name} (having trouble; showing results from ${s.last_ok ? relTime(s.last_ok) : "earlier"})`);
+  $("#status").textContent = notes.length ? `Delayed: ${notes.join(", ")}.` : "";
 
   new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting && rendered < items.length) renderMore();

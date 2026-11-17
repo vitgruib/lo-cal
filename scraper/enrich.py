@@ -166,7 +166,23 @@ def topics_for(e: Event) -> list[str]:
     return [t for t, rx in _TOPIC_RES.items() if rx.search(text)]
 
 
+_MONTH = r"(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?"
+# A title tail the card already shows: "| San Francisco, CA" or "| Nov 17th, 2026".
+_TAIL = re.compile(rf"\s*\|\s*([A-Z][\w .'-]+,\s*[A-Z]{{2}}|{_MONTH}\s+\d{{1,2}}(st|nd|rd|th)?(,?\s*\d{{4}})?)\s*$",
+                   re.IGNORECASE)
+_URL = re.compile(r"\S*(https?://|www\.)\S*")
+
+
+def tidy(e: Event) -> None:
+    while (cut := _TAIL.sub("", e.title)) != e.title and cut:
+        e.title = cut
+    # "Member Login: www.example.com" says nothing a card should show.
+    if _URL.search(e.description) and len(_URL.sub("", e.description).split()) < 3:
+        e.description = ""
+
+
 def enrich(e: Event) -> Event | None:
+    tidy(e)
     e.region = region_for(e)
     if e.region is None:
         return None

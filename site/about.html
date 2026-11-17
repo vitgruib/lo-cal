@@ -338,12 +338,19 @@
       }
     }
     fetch("data/events.json", { cache: "no-cache" }).then((r) => r.json()).then((data) => {
-      for (const s of data.sources) {
+      const now = Date.now();
+      const live = data.events.filter((e) => (e.end ? Date.parse(e.end) : Date.parse(e.start) + 2 * 3600e3) > now);
+      const counts = {};
+      for (const e of live) for (const id of [e.source, ...(e.also_on || [])]) counts[id] = (counts[id] || 0) + 1;
+      // Biggest first; sources not connected yet go last.
+      const order = [...data.sources].sort((a, b) => (a.health === "off") - (b.health === "off") || (counts[b.id] || 0) - (counts[a.id] || 0));
+      for (const s of order) {
         const card = document.querySelector(`.source[data-source="${s.id}"]`);
         if (!card) continue;
+        card.parentElement.append(card);
         const tag = document.createElement("span");
         tag.className = `live ${s.health}`;
-        tag.textContent = s.health === "off" ? "not connected" : s.count.toLocaleString();
+        tag.textContent = s.health === "off" ? "coming later" : (counts[s.id] || 0).toLocaleString();
         tag.title = statusText(s);
         card.querySelector("summary").append(tag);
         const status = document.createElement("p");
@@ -352,7 +359,7 @@
         card.append(status);
       }
       document.getElementById("updated").textContent =
-        `${data.events.length.toLocaleString()} upcoming events right now. Tap a source to see how it's read.`;
+        `${live.length.toLocaleString()} upcoming events right now. Tap a source to see how it's read.`;
       const words = document.getElementById("topic-words");
       for (const [topic, patterns] of Object.entries(data.topic_words || {})) {
         const d = document.createElement("details");

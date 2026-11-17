@@ -102,13 +102,16 @@
     for (const pre of document.querySelectorAll(".ai pre")) {
       const b = document.createElement("button");
       b.type = "button";
-      b.className = "link copy";
+      b.className = "copy";
       b.textContent = "Copy";
       b.onclick = async () => {
-        try { await navigator.clipboard.writeText(pre.textContent); b.textContent = "Copied"; }
-        catch { b.textContent = "Select the text to copy"; }
+        try { await navigator.clipboard.writeText(pre.textContent); b.textContent = "Copied"; setTimeout(() => { b.textContent = "Copy"; }, 1500); }
+        catch { b.textContent = "Select to copy"; }
       };
-      pre.after(b);
+      const box = document.createElement("div");
+      box.className = "code";
+      pre.replaceWith(box);
+      box.append(pre, b);
     }
   </script>
 </body>

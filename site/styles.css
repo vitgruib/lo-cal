@@ -102,7 +102,7 @@ svg { flex: none; }
 .link:hover { color: var(--ink); }
 .iconbtn { display: grid; place-items: center; width: 32px; height: 32px; padding: 0 0 2px; font: 400 20px/1 var(--body); color: var(--ink-2); background: var(--surface); border: 1px solid var(--faint); border-radius: 8px; cursor: pointer; }
 .iconbtn:hover:not(:disabled) { border-color: var(--muted); }
-.iconbtn:disabled { opacity: .4; cursor: default; }
+.iconbtn:disabled { opacity: .3; border-color: transparent; background: transparent; cursor: default; }
 .iconbtn.plain { border: 0; background: none; font-size: 16px; }
 .arrow-link, .arrow-out { font: 600 12.5px var(--body); color: var(--title); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
 .arrow-out::after { content: " ↗"; font-size: .9em; }
@@ -222,22 +222,22 @@ svg { flex: none; }
 .badges:empty { display: none; }
 .badges { gap: 4px 0; }
 .badge { font-size: 12px; font-weight: 500; color: var(--ink-2); }
-.badge + .badge::before { content: "·"; margin: 0 7px; color: var(--muted); }
+.badge:has(+ .badge)::after { content: "·"; margin: 0 7px; color: var(--muted); font-weight: 400; }
 .badge.food { color: #a8741a; font-weight: 600; }
 .via { flex-basis: 100%; font-size: 12px; color: var(--muted); }
 .via a { color: inherit; text-decoration: none; }
 .via a:hover { color: var(--ink); text-decoration: underline; }
-.thumb { width: 74px; height: 70px; object-fit: cover; border-radius: 6px; background: var(--chip); align-self: start; }
+.thumb { width: 74px; height: 70px; object-fit: contain; border-radius: 6px; background: var(--chip); align-self: start; }
 .thumb:not([src]) { display: none; }
 /* Calendar and Report share one quiet text-button style. */
 .card .actions { grid-column: 2; grid-row: 2; display: flex; gap: 18px; margin-top: 10px; }
-.calbtn, .flag {
+.calbtn, .flag, .share {
   list-style: none; display: flex; align-items: center; gap: 5px; padding: 2px 0;
   font: 500 12.5px/1 var(--body); color: var(--muted); text-decoration: none; white-space: nowrap; cursor: pointer;
   background: none; border: 0;
 }
-.calbtn svg, .flag svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
-.calbtn:hover, .flag:hover, .addcal[open] .calbtn { color: var(--ink); }
+.calbtn svg, .flag svg, .share svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+.calbtn:hover, .flag:hover, .share:hover, .addcal[open] .calbtn { color: var(--ink); }
 .addcal { position: relative; }
 .calbtn::-webkit-details-marker { display: none; }
 .calmenu {
@@ -297,7 +297,7 @@ svg { flex: none; }
 .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px 0; text-align: center; }
 .cal-grid .dow { font-size: 10.5px; color: var(--muted); padding: 6px 0; }
 .cal-grid button { height: 34px; font: 500 12.5px var(--body); color: var(--ink); background: none; border: 0; cursor: pointer; }
-.cal-grid button.out { color: var(--muted); opacity: .6; }
+.cal-grid button.out { visibility: hidden; }
 .cal-grid button:disabled { color: var(--muted); opacity: .35; cursor: default; }
 .cal-grid button.in { background: color-mix(in srgb, #dfe2fd 70%, var(--surface)); }
 .cal-grid button.end { background: var(--navy); color: #fff; border-radius: 6px; }
@@ -352,7 +352,7 @@ svg { flex: none; }
   .time { font-size: 13px; }
   .thumb { display: none; }
   .card .actions, .card.row .actions { grid-column: 2; grid-row: auto; gap: 22px; margin-top: 10px; }
-  .calbtn, .flag { height: 30px; }
+  .calbtn, .flag, .share { height: 30px; }
   .card.row { grid-template-columns: 76px minmax(0, 1fr); }
   .foot-row .updated { margin-left: 0; }
   .sort { margin-left: 0; }
@@ -390,8 +390,10 @@ svg { flex: none; }
 .prose li { margin: 6px 0; }
 .prose code { font-size: 13.5px; background: var(--chip); padding: 1px 5px; border-radius: 5px; }
 .note { color: var(--muted); font-size: 14px; }
-.ai pre { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 2px; }
-.ai .copy { font-size: 13px; margin-bottom: 8px; }
+.code { position: relative; margin: 6px 0 14px; }
+.ai pre { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 70px 10px 12px; font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
+.ai .copy { position: absolute; top: 7px; right: 7px; font: 600 12px var(--body); color: var(--ink); background: var(--chip); border: 1px solid var(--line); border-radius: 6px; padding: 4px 9px; cursor: pointer; text-decoration: none; }
+.ai .copy:hover { border-color: var(--muted); }
 .prose summary { cursor: pointer; list-style: none; }
 .prose summary::-webkit-details-marker { display: none; }
 .sources { background: var(--surface); border: 1px solid var(--faint); border-radius: var(--radius); overflow: hidden; }
@@ -429,7 +431,7 @@ svg { flex: none; }
 .bars { display: grid; gap: 4px; margin: 8px 0 20px; }
 .bar { display: grid; grid-template-columns: minmax(90px, 160px) 1fr 48px; align-items: center; gap: 10px; padding: 2px 0; font-size: 13px; }
 .bar:hover { background: var(--chip); border-radius: 6px; }
-.bar .label { color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar .label { color: var(--ink); line-height: 1.25; }
 .bar .track { height: 12px; }
 .bar .fill { display: block; height: 100%; min-width: 2px; background: var(--accent); border-radius: 0 4px 4px 0; }
 .bar .value { color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }

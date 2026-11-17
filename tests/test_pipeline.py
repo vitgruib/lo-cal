@@ -265,3 +265,19 @@ def test_arts_and_music_matches_whole_words_only(title, is_arts):
     [e] = build([ev(title)], 30, NOW)
 
     assert ("Arts & Music" in e.tags) is is_arts
+
+
+@pytest.mark.parametrize("raw, clean", [
+    ("Authentic Leadership in the Age of AI | San Francisco, CA | Nov 17th, 2026",
+     "Authentic Leadership in the Age of AI"),
+    ("Founders Dinner | Nov 20", "Founders Dinner"),
+    ("Rust | Go | Zig night", "Rust | Go | Zig night"),
+])
+def test_city_and_date_tails_are_cut_from_titles(raw, clean):
+    [e] = build([ev(raw)], 30, NOW)
+    assert e.title == clean
+
+
+def test_a_description_that_is_only_a_link_is_dropped():
+    [e] = build([ev("Run club", description="Member Login: www.members.marinarunclub.com")], 30, NOW)
+    assert e.description == ""
