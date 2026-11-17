@@ -458,7 +458,7 @@ function renderControls() {
     })));
   const regionPicks = [...state.regions].filter((r) => r !== CAMPUS);
   $("#loc-label").textContent = state.regions.has(CAMPUS) ? "On campus"
-    : regionPicks.length === 1 ? regionPicks[0] : regionPicks.length ? `${regionPicks.length} locations` : "All Berkeley locations";
+    : regionPicks.length === 1 ? regionPicks[0] : regionPicks.length ? `${regionPicks.length} locations` : "Anywhere";
   $("#dd-loc").classList.toggle("on", state.regions.size > 0);
   $("#campus").checked = state.regions.has(CAMPUS);
 
@@ -506,7 +506,7 @@ function renderPills() {
   const regions = [...state.regions];
   const types = [...state.topics].filter((t) => t !== FOOD);
   $("#scope").textContent = [
-    regions.length ? "" : "All Berkeley",
+    regions.length ? "" : "Anywhere",
     types.length ? "" : "All categories",
   ].filter(Boolean).join(" · ");
 }
