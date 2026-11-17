@@ -18,7 +18,6 @@ const FOOD = "Free food";
 // "On campus only" picks this location on its own; the Where menu lists the rest.
 const CAMPUS = "Campus";
 const STATUS = { now: "Happening now", soon: "Still to come", done: "Already finished" };
-const SAVED_KEY = "lo-cal-saved";
 const PREFS_KEY = "lo-cal-prefs";
 const SORT_KEY = "lo-cal-sort";
 
@@ -34,7 +33,7 @@ const fmtMonth = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "lon
 const hourOf = new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "numeric", hourCycle: "h23" });
 
 let data = { events: [], sources: [], topics: [], regions: [] };
-let state = { q: "", when: DEFAULT_WHEN, from: "", to: "", topics: new Set(), regions: new Set(), free: false, status: "", saved: false, event: "" };
+let state = { q: "", when: DEFAULT_WHEN, from: "", to: "", topics: new Set(), regions: new Set(), free: false, status: "", event: "" };
 let filtered = [];
 let items = [];
 let rendered = 0;
@@ -48,15 +47,8 @@ function load(key, fallback) {
 function store(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* not kept, still works this visit */ }
 }
-const saved = new Set(load(SAVED_KEY, []));
 const prefs = new Set(load(PREFS_KEY, []));
 let sort = load(SORT_KEY, "time");
-
-function toggleSave(id) {
-  saved.has(id) ? saved.delete(id) : saved.add(id);
-  store(SAVED_KEY, [...saved]);
-  renderSavedCount();
-}
 
 /* ---------- URL state ---------- */
 
@@ -71,14 +63,12 @@ function readHash() {
   state.regions = new Set((p.get("r") || "").split(",").filter(Boolean));
   state.free = p.get("free") === "1";
   state.status = STATUS[p.get("status")] ? p.get("status") : "";
-  state.saved = p.get("saved") === "1";
   state.event = p.get("event") || "";
 }
 
 function writeHash() {
   const p = new URLSearchParams();
   if (state.event) p.set("event", state.event);
-  if (state.saved) p.set("saved", "1");
   if (state.q) p.set("q", state.q);
   if (state.when !== DEFAULT_WHEN) p.set("when", state.when);
   if (state.when === "custom") {
@@ -143,8 +133,6 @@ function base(skip, wide) {
   // A shared link shows just that event, whatever filters the viewer had.
   if (state.event) return data.events.filter((e) => e.id === state.event);
   const q = parseQuery();
-  // Saved shows every saved event still on the calendar; other filters don't hide a plan.
-  if (state.saved) return data.events.filter((e) => saved.has(e.id) && statusOf(e) !== "done");
   // Typed dates narrow the When choice rather than replace it; "wide" is every upcoming date.
   let range = wide ? ["0000", "9999"] : whenRange(state.when);
   if (q.days && !wide) range = [q.days[0] > range[0] ? q.days[0] : range[0], q.days[1] < range[1] ? q.days[1] : range[1]];
@@ -448,7 +436,7 @@ function renderControls() {
     const b = document.createElement("button");
     b.type = "button";
     b.setAttribute("role", "radio");
-    b.setAttribute("aria-checked", !state.saved && state.when === k);
+    b.setAttribute("aria-checked", state.when === k);
     if (k === "custom") {
       b.className = "custom";
       b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4m7-4v4"/></svg>`;
@@ -457,7 +445,7 @@ function renderControls() {
       b.onclick = openDates;
     } else {
       b.append(label);
-      b.onclick = () => { state.when = k; state.saved = false; update(); };
+      b.onclick = () => { state.when = k; update(); };
     }
     return b;
   }));
@@ -507,7 +495,7 @@ function activeFilters() {
 function renderPills() {
   const when = WHEN.find(([k]) => k === state.when)[1];
   const pills = [];
-  if (!state.saved && !state.event) {
+  if (!state.event) {
     const label = state.when === "custom" ? rangeLabel(...whenRange("custom")) : when;
     pills.push(state.when === DEFAULT_WHEN
       ? Object.assign(document.createElement("span"), { className: "qchip", textContent: label })
@@ -542,7 +530,6 @@ function renderHead() {
   const [from, to] = whenRange(state.when);
   let title, date = "";
   if (state.event) title = "Shared event";
-  else if (state.saved) [title, date] = ["Saved", "Events you saved in this browser"];
   else if (state.when === "all") [title, date] = ["All upcoming", ""];
   else if (from === to) {
     title = from === today ? "Today" : from === addDays(today, 1) ? "Tomorrow" : fmtDay.format(keyDate(from));
@@ -555,7 +542,7 @@ function renderHead() {
   $("#view-date").textContent = date;
   $("#count").textContent = plural(filtered.length, "event");
   // Arrows step by the length of what's shown: a day at a time, a week at a time.
-  const stepping = !state.event && !state.saved && state.when !== "all" && to !== "9999";
+  const stepping = !state.event && state.when !== "all" && to !== "9999";
   $("#prev").hidden = $("#next").hidden = !stepping;
   $("#prev").disabled = from <= today;
 }
@@ -605,7 +592,7 @@ function plan(events) {
     days.get(k).push(e);
   }
   const keys = [...days.keys()].sort();
-  const single = keys.length <= 1 && !state.saved && whenRange(state.when)[0] === whenRange(state.when)[1];
+  const single = keys.length <= 1 && whenRange(state.when)[0] === whenRange(state.when)[1];
   const out = [];
   for (const k of keys) {
     const list = days.get(k);
@@ -713,12 +700,6 @@ function renderEmpty() {
   box.className = "empty";
   const strong = document.createElement("strong");
   box.append(strong);
-  if (state.saved) {
-    strong.textContent = "Nothing saved yet.";
-    box.append("Tap Save on any event and it shows up here, ready to add to your calendar.");
-    $("#list").replaceChildren(box);
-    return;
-  }
   const wider = state.event ? [] : base(undefined, true);
   if (!wider.length) {
     strong.textContent = "No events match.";
@@ -841,23 +822,7 @@ function card(e, row = false) {
   if (e.image && !row) img.src = e.image; else img.remove();
   img.onerror = () => img.remove();
 
-  const save = node.querySelector(".save");
-  const tomine = node.querySelector(".tomine");
-  const showSaved = () => {
-    const on = saved.has(e.id);
-    save.setAttribute("aria-pressed", on);
-    save.querySelector("span").textContent = on ? "Saved" : "Save";
-    save.title = on ? "Remove from your Lo-Cal calendar" : "Save to your Lo-Cal calendar";
-    tomine.textContent = on ? "✓ In my Lo-Cal calendar" : "Add to my Lo-Cal calendar";
-  };
   node.style.setProperty("--vt", `e${e.id}`);
-  save.onclick = tomine.onclick = () => {
-    toggleSave(e.id);
-    showSaved();
-    if (saved.has(e.id)) save.classList.add("pop");
-  };
-  save.onanimationend = () => save.classList.remove("pop");
-  showSaved();
 
   const end = endOf(e);
   const calPlace = e.address || e.venue || "";
@@ -927,11 +892,6 @@ function downloadIcs(events, name) {
 /* ---------- My calendar ---------- */
 
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const savedEvents = () => data.events.filter((e) => saved.has(e.id) && statusOf(e) !== "done").sort((a, b) => a._start - b._start);
-
-function renderSavedCount() {
-  $("#saved-n").textContent = savedEvents().length;
-}
 
 // The build writes one feed per filter combination (scraper/ics.py): f/<type>.<location>.<cost>.ics.
 function feedFor() {
@@ -945,55 +905,26 @@ function feedFor() {
 }
 
 function renderCalDialog() {
-  const kind = document.querySelector("input[name=calkind]:checked").value;
-  const evs = savedEvents();
-  $("#saved-sum").textContent = `${plural(evs.length, "event")} · one file with all of them`;
   const feed = feedFor();
-  $("#feed-sum").textContent = feed ? `${feed.name} · new events arrive on their own` : "Built from your filters. New events arrive on their own.";
+  $("#feed-sum").textContent = feed ? feed.name : "Pick at most one event type and one location in the filters.";
   const google = $("#cal-google"), other = $("#cal-other"), note = $("#feed-note");
   note.hidden = true;
-  google.classList.remove("disabled");
-  other.classList.remove("disabled");
-  google.onclick = other.onclick = null;
-  if (kind === "saved") {
-    google.querySelector("span").textContent = "Add to Google Calendar";
-    // Google can't open a file from a link: download it, then open Google's import page.
-    google.href = "https://calendar.google.com/calendar/u/0/r/settings/export";
-    google.onclick = () => downloadIcs(evs, "lo-cal-saved");
-    other.removeAttribute("href");
-    other.onclick = () => downloadIcs(evs, "lo-cal-saved");
-    other.querySelector("span").textContent = "Apple, Outlook, or another calendar";
-    if (!evs.length) {
-      note.textContent = "Save events first: tap Save on any event.";
+  google.classList.toggle("disabled", !feed);
+  other.classList.toggle("disabled", !feed);
+  if (feed) {
+    const url = new URL(feed.file, location.href).href;
+    const webcal = url.replace(/^https?:/, "webcal:");
+    google.href = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(webcal)}`;
+    other.href = webcal;
+    if (state.q || state.when !== DEFAULT_WHEN || state.status) {
+      note.textContent = "Search words, dates and status aren't part of a feed: it holds every upcoming event that matches.";
       note.hidden = false;
-      google.classList.add("disabled");
-      other.classList.add("disabled");
     }
-    $("#cal-privacy span").textContent = "Your saves stay in this browser; nothing is sent anywhere. The file is a one-time copy: add it again after saving more, or subscribe to a custom feed to stay in sync.";
-  } else {
-    google.querySelector("span").textContent = "Connect Google Calendar";
-    other.querySelector("span").textContent = "Apple, Outlook, or another calendar";
-    if (!feed) {
-      note.textContent = "A feed follows one event type and one location. Pick at most one of each in the filters.";
-      note.hidden = false;
-      google.classList.add("disabled");
-      other.classList.add("disabled");
-    } else {
-      const url = new URL(feed.file, location.href).href;
-      const webcal = url.replace(/^https?:/, "webcal:");
-      google.href = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(webcal)}`;
-      other.href = webcal;
-      if (state.q || state.when !== DEFAULT_WHEN || state.status) {
-        note.textContent = "Search words, dates and status aren't part of a feed: it holds every upcoming event that matches.";
-        note.hidden = false;
-      }
-    }
-    $("#cal-privacy span").textContent = "Feeds are public files, the same for everyone. Subscribing sends nothing about you, and your calendar app checks for new events every few hours.";
   }
+  $("#cal-privacy span").textContent = "Feeds are public files, the same for everyone. Subscribing sends nothing about you, and your calendar app checks for new events every few hours.";
 }
 
 function openCal() {
-  if (!savedEvents().length && feedFor()) document.querySelector("input[name=calkind][value=feed]").checked = true;
   renderCalDialog();
   $("#cal-dlg").showModal();
 }
@@ -1108,13 +1039,12 @@ async function boot() {
   let t;
   $("#q").addEventListener("input", (ev) => {
     clearTimeout(t);
-    t = setTimeout(() => { state.q = ev.target.value.trim(); state.saved = false; update(); }, 120);
+    t = setTimeout(() => { state.q = ev.target.value.trim(); update(); }, 120);
   });
   $("#search").onsubmit = (ev) => {
     ev.preventDefault();
     clearTimeout(t);
     state.q = $("#q").value.trim();
-    state.saved = false;
     update();
     if (matchMedia("(pointer: coarse)").matches) $("#q").blur();
   };
@@ -1141,7 +1071,7 @@ async function boot() {
     setSort(ev.target.value);
   };
   $("#reset").onclick = () => {
-    Object.assign(state, { event: "", saved: false, when: DEFAULT_WHEN, from: "", to: "", free: false, status: "" });
+    Object.assign(state, { event: "", when: DEFAULT_WHEN, from: "", to: "", free: false, status: "" });
     state.topics.clear(); state.regions.clear();
     update();
   };
@@ -1150,7 +1080,6 @@ async function boot() {
   $("#open-filters").onclick = () => setDrawer(true);
   $("#side-close").onclick = $("#scrim").onclick = () => setDrawer(false);
   $("#mycal").onclick = $("#setup-cal").onclick = openCal;
-  for (const r of document.querySelectorAll("input[name=calkind]")) r.onchange = renderCalDialog;
   $("#edit-prefs").onclick = () => $("#pref-dlg").showModal();
   $("#pref-clear").onclick = () => {
     prefs.clear();
@@ -1170,7 +1099,7 @@ async function boot() {
   };
   $("#apply-dates").onclick = () => {
     const [lo, hi] = pick.b && pick.b < pick.a ? [pick.b, pick.a] : [pick.a, pick.b || pick.a];
-    Object.assign(state, { when: "custom", from: lo, to: hi, saved: false });
+    Object.assign(state, { when: "custom", from: lo, to: hi });
     $("#dates-dlg").close();
     update();
   };
@@ -1215,7 +1144,6 @@ async function boot() {
       .filter(Boolean).join(" "))} `;
   }
   buildAliases();
-  renderSavedCount();
   renderPrefs();
 
   $("#updated").textContent = `Updated ${relTime(data.generated_at)}`;
@@ -1227,7 +1155,7 @@ async function boot() {
     if (entries[0].isIntersecting && rendered < items.length) renderMore();
   }, { rootMargin: "800px" }).observe($("#sentinel"));
 
-  // A shared link pasted into an open tab, or the header's Saved link, only changes the hash.
+  // A shared link pasted into an open tab only changes the hash.
   addEventListener("hashchange", () => { readHash(); $("#q").value = state.q; update(); });
   update();
 }

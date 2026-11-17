@@ -8,8 +8,8 @@ backend (see the "Backend server" section of issue #4). This file is not linked 
 
 - The header in the mockup shows a signed-in person (avatar, name, menu).
 - Sign in with Google (Berkeley accounts first). Everything below hangs off an account.
-- Until then, saves and preferences live in the visitor's browser (`localStorage`). They don't
-  move between devices, and clearing site data loses them.
+- Until then, preferences live in the visitor's browser (`localStorage`). They don't move
+  between devices, and clearing site data loses them.
 
 ## Saved events that sync to a calendar subscription
 
@@ -18,8 +18,8 @@ backend (see the "Backend server" section of issue #4). This file is not linked 
 - Needs a private feed URL per person, for example `/u/<random-token>/saved.ics`, served from the
   saves stored on the server, so a calendar app subscribes once and each new save shows up on its
   next poll.
-- Today the site offers a one-time `.ics` download of the saved events, plus self-updating feeds
-  built from filters, which work without a server because every filter combination is
+- Today the site has no Save: it was removed on 2026-11-16, since a browser-only list did less
+  than each event's Calendar button. It offers self-updating feeds built from filters, which work without a server because every filter combination is
   pre-generated (`site/data/cal/f/`).
 - The privacy note from the mockup applies: the feed link is private, so share it only with
   people you trust.

@@ -109,9 +109,6 @@ def event_page(e: Event, site_url: str) -> str:
           <a href="../about.html">How it works</a>
           <a href="../stats.html">Stats</a>
         </nav>
-        <a class="saved-link" href="../#saved=1" title="Events you saved in this browser">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-3.5L7 20z"/></svg>Saved
-        </a>
       </div>
     </header>
   <main class="wrap event-page">

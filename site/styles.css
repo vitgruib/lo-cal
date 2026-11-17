@@ -66,14 +66,11 @@ svg { flex: none; }
 :root[data-theme="dark"] .logo-mark svg { stroke: #43300c; }
 .logo-word { font: 600 30px/1 var(--wordmark-font, var(--serif)); letter-spacing: -0.02em; color: var(--title); }
 .logo-word span { color: #c39435; }
+.nbadge { min-width: 20px; padding: 1px 6px; border-radius: 999px; background: var(--chip); color: var(--ink-2); font-size: 11.5px; font-weight: 600; text-align: center; }
 .nav { display: flex; gap: 22px; align-self: stretch; }
 .nav a { display: flex; align-items: center; font-size: 13.5px; font-weight: 500; color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; }
 .nav a:hover { color: var(--ink); }
 .nav a[aria-current="page"] { color: var(--title); font-weight: 600; border-bottom-color: var(--gold); }
-.saved-link { margin-left: auto; display: flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); text-decoration: none; padding: 6px 8px; border-radius: 8px; }
-.saved-link:hover { background: var(--chip); }
-.saved-link svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
-.nbadge { min-width: 20px; padding: 1px 6px; border-radius: 999px; background: var(--chip); color: var(--ink-2); font-size: 11.5px; font-weight: 600; text-align: center; }
 
 .subbar { background: var(--surface); border-bottom: 1px solid var(--line); }
 .subbar-in { display: grid; grid-template-columns: 172px minmax(0, 1fr) auto; align-items: center; gap: 28px; padding-top: 16px; padding-bottom: 16px; }
@@ -225,17 +222,15 @@ svg { flex: none; }
 .via a:hover { color: var(--ink); text-decoration: underline; }
 .thumb { width: 74px; height: 70px; object-fit: cover; border-radius: 6px; background: var(--chip); align-self: start; }
 .thumb:not([src]) { display: none; }
-/* Save, Calendar and Report share one secondary-button style; only a saved event is tinted. */
+/* Calendar and Report share one quiet text-button style. */
 .card .actions { grid-column: 2; grid-row: 2; display: flex; gap: 18px; margin-top: 10px; }
-.save, .calbtn, .flag {
+.calbtn, .flag {
   list-style: none; display: flex; align-items: center; gap: 5px; padding: 2px 0;
   font: 500 12.5px/1 var(--body); color: var(--muted); text-decoration: none; white-space: nowrap; cursor: pointer;
   background: none; border: 0;
 }
-.save svg, .calbtn svg, .flag svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
-.save:hover, .calbtn:hover, .flag:hover, .addcal[open] .calbtn { color: var(--ink); }
-.save[aria-pressed="true"] { color: #a8741a; }
-.save[aria-pressed="true"] svg { fill: currentColor; }
+.calbtn svg, .flag svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+.calbtn:hover, .flag:hover, .addcal[open] .calbtn { color: var(--ink); }
 .addcal { position: relative; }
 .calbtn::-webkit-details-marker { display: none; }
 .calmenu {
@@ -245,7 +240,6 @@ svg { flex: none; }
 }
 .calmenu a, .calmenu button { font: 500 13px var(--body); color: var(--ink); text-decoration: none; text-align: left; background: none; border: 0; padding: 7px 10px; border-radius: 5px; cursor: pointer; white-space: nowrap; }
 .calmenu a:hover, .calmenu button:hover { background: var(--chip); }
-.calmenu .tomine { color: var(--title); font-weight: 600; border-bottom: 1px solid var(--line); border-radius: 5px 5px 0 0; margin-bottom: 2px; }
 
 /* All-day events: one compact row each. */
 .card.row { grid-template-columns: 84px minmax(0, 1fr) auto; align-items: center; padding: 14px 16px 14px 18px; }
@@ -356,9 +350,6 @@ svg { flex: none; }
   .nav { gap: 10px; }
   .nav a { font-size: 12.5px; }
   .logo-mark { display: none; }
-  .saved-link { padding: 6px 2px; font-size: 0; gap: 4px; }
-  .saved-link svg { width: 18px; height: 18px; }
-  .saved-link .nbadge { font-size: 11px; }
   .subbar-in { grid-template-columns: 1fr; }
   .kbd { display: none; }
   .search .btn { display: none; }
@@ -371,7 +362,7 @@ svg { flex: none; }
   .time { font-size: 13px; }
   .thumb { display: none; }
   .card .actions, .card.row .actions { grid-column: 2; grid-row: auto; gap: 22px; margin-top: 10px; }
-  .save, .calbtn, .flag { height: 30px; }
+  .calbtn, .flag { height: 30px; }
   .card.row { grid-template-columns: 76px minmax(0, 1fr); }
   .cal-banner { flex-wrap: wrap; }
   .cal-banner .btn { margin-left: 0; width: 100%; }
@@ -488,7 +479,6 @@ html[data-vt="prev"] { --page-out: page-out-right; --page-in: page-in-left; }
 .card:hover .time { transform: translateX(3px) rotate(-1.5deg); }
 .card { transition: background-color .2s; }
 .card:hover { background: color-mix(in srgb, var(--surface) 70%, var(--bg)); }
-.save.pop svg { animation: .45s cubic-bezier(.3, 1.6, .5, 1) pop; }
 
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
 @keyframes fade-out { to { opacity: 0; } }
@@ -496,7 +486,6 @@ html[data-vt="prev"] { --page-out: page-out-right; --page-in: page-in-left; }
 @keyframes page-out-right { to { opacity: 0; transform: translateX(40px) rotateY(-8deg); } }
 @keyframes page-in-right { from { opacity: 0; transform: translateX(60px) rotateY(-8deg); } }
 @keyframes page-in-left { from { opacity: 0; transform: translateX(-60px) rotateY(8deg); } }
-@keyframes pop { 40% { transform: scale(1.45) rotate(-8deg); } }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--green) 55%, transparent); } 100% { box-shadow: 0 0 0 7px transparent; } }
 
 @media (prefers-reduced-motion: reduce) {

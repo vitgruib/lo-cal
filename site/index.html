@@ -34,9 +34,6 @@
         <a href="about.html">How it works</a>
         <a href="stats.html">Stats</a>
       </nav>
-      <a class="saved-link" href="./#saved=1" id="saved-link" title="Events you saved in this browser">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-3.5L7 20z"/></svg>Saved<span class="nbadge" id="saved-n">0</span>
-      </a>
     </div>
   </header>
 
@@ -144,7 +141,7 @@
 
       <section class="cal-banner">
         <span class="banner-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4m7-4v4"/></svg></span>
-        <div><b>Get these in your calendar</b><span>Add the events you saved all at once, or subscribe to your filters so new ones show up on their own.</span></div>
+        <div><b>Get these in your calendar</b><span>Subscribe to your filters and new events show up on their own. Each event's Calendar button adds just that one.</span></div>
         <button class="btn ghost" id="setup-cal" type="button">Set up my calendar</button>
       </section>
 
@@ -166,10 +163,9 @@
   </dialog>
 
   <dialog class="modal" id="cal-dlg" aria-labelledby="cal-title">
-    <div class="modal-head"><h2 id="cal-title">Your Lo-Cal calendar</h2><button class="iconbtn plain" type="button" data-close aria-label="Close">✕</button></div>
-    <p class="modal-sub">One calendar for your plans. Choose what to include, then add it to your calendar.</p>
-    <label class="opt"><input type="radio" name="calkind" value="saved" checked><span><b>My saved events</b><small id="saved-sum"></small></span></label>
-    <label class="opt"><input type="radio" name="calkind" value="feed"><span><b>A custom event feed</b><small id="feed-sum">Built from your filters. New events arrive on their own.</small></span></label>
+    <div class="modal-head"><h2 id="cal-title">Subscribe in your calendar</h2><button class="iconbtn plain" type="button" data-close aria-label="Close">✕</button></div>
+    <p class="modal-sub">Subscribe to the events matching your filters. New ones show up in your calendar on their own.</p>
+    <div class="range-sum"><div><b>Your feed</b><span id="feed-sum"></span></div></div>
     <p class="feed-note" id="feed-note" hidden></p>
     <div class="modal-actions">
       <a class="btn gold" id="cal-google" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4m7-4v4"/></svg><span>Connect Google Calendar</span></a>
@@ -197,11 +193,9 @@
       </div>
       <img class="thumb" alt="" loading="lazy" decoding="async">
       <div class="actions">
-        <button class="save" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-3.5L7 20z"/></svg><span>Save</span></button>
         <details class="addcal">
           <summary class="calbtn" title="Add this event to a calendar"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4m7-4v4"/></svg><span>Calendar</span></summary>
           <div class="calmenu">
-            <button class="tomine" type="button">Save to my Lo-Cal calendar</button>
             <a class="gcal" target="_blank" rel="noopener">Google Calendar</a>
             <a class="ocal" target="_blank" rel="noopener">Outlook</a>
             <button class="ics" type="button">Apple &amp; others (.ics)</button>

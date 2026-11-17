@@ -121,16 +121,12 @@ def check_events(page: Page, base: str, size: str, errors: list[str]) -> None:
     if page.locator("#side-close").is_visible():
         page.locator("#side-close").click()
 
-    # Saving puts the event in the Saved view and in the bundled calendar file.
-    page.locator(".card .save >> visible=true").first.click()
-    if page.locator("#saved-n").inner_text() != "1":
-        errors.append(f"{where}: saving an event did not count it in the header")
+    # My calendar offers a subscription to the feed matching the filters.
     page.locator("#mycal").click()
-    if not page.locator("#cal-dlg[open]").count() or not page.locator("#saved-sum").inner_text().startswith("1 event"):
-        errors.append(f"{where}: My calendar does not offer the saved event")
+    google = page.locator("#cal-google").get_attribute("href") or ""
+    if not page.locator("#cal-dlg[open]").count() or "webcal" not in google:
+        errors.append(f"{where}: My calendar does not offer a feed to subscribe to")
     page.keyboard.press("Escape")
-    page.locator("#saved-link").click()
-    page.wait_for_function("document.querySelector('#count').textContent === '1 event'", timeout=5_000)
 
     page.goto(f"{base}/#when=all", wait_until="networkidle")
     show_filters(page)
