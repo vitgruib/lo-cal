@@ -659,7 +659,9 @@ function renderMore() {
 // Filter changes reflow the list in place; day steps ("next"/"prev") turn it like a page.
 function update(kind = "reflow") {
   const root = document.documentElement;
-  if (!document.startViewTransition || !started || matchMedia("(prefers-reduced-motion: reduce)").matches) return draw();
+  // Transition snapshots paint above everything, an open dialog included.
+  if (!document.startViewTransition || !started || document.querySelector("dialog[open]")
+      || matchMedia("(prefers-reduced-motion: reduce)").matches) return draw();
   root.dataset.vt = kind;
   document.startViewTransition(draw).finished.finally(() => delete root.dataset.vt);
 }
