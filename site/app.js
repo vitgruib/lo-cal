@@ -478,6 +478,42 @@ function renderControls() {
   $("#filters-n").hidden = !n;
   renderPills();
   renderQueryChips();
+  renderQuick();
+}
+
+// One-tap versions of the filters people use most; the full set stays in the sidebar.
+const QUICK = [
+  ["🍴 Free food", () => state.topics.has(FOOD), () => toggle(state.topics, FOOD)],
+  ["Free admission", () => state.free, () => { state.free = !state.free; update(); }],
+  ["📍 On campus", () => state.regions.has(CAMPUS), () => toggle(state.regions, CAMPUS)],
+  ["Tomorrow", () => state.when === "tomorrow", () => { state.when = state.when === "tomorrow" ? DEFAULT_WHEN : "tomorrow"; update(); }],
+  ["This weekend", () => state.when === "weekend", () => { state.when = state.when === "weekend" ? DEFAULT_WHEN : "weekend"; update(); }],
+];
+
+function renderQuick() {
+  $("#quick").replaceChildren(...QUICK.map(([label, on, flip]) => {
+    const b = Object.assign(document.createElement("button"), { type: "button", className: "qf", textContent: label, onclick: flip });
+    b.setAttribute("aria-pressed", on());
+    return b;
+  }));
+}
+
+// The next few events with a picture, big, on the plain Today view only.
+function renderFeatured() {
+  const box = $("#featured");
+  const now = Date.now();
+  const plain = state.when === DEFAULT_WHEN && !state.q && !state.event && !activeFilters().length;
+  const next = plain ? filtered.filter((e) => e.image && e._start > now).sort((a, b) => a._start - b._start).slice(0, 3) : [];
+  box.hidden = next.length < 3;
+  box.replaceChildren(...next.map((e) => {
+    const a = Object.assign(document.createElement("a"), { className: "feat", href: e.url, target: "_blank", rel: "noopener" });
+    a.innerHTML = `<img alt="" loading="lazy"><span class="feat-when"></span><b></b><span class="feat-where"></span>`;
+    a.querySelector("img").src = e.image;
+    a.querySelector(".feat-when").textContent = fmtTime.format(new Date(e._start));
+    a.querySelector("b").textContent = e.title;
+    a.querySelector(".feat-where").textContent = e.venue || e.region || "";
+    return a;
+  }));
 }
 
 // Every filter in use, each with a way to drop it: the pills above the list and the Reset count.
@@ -497,9 +533,10 @@ function renderPills() {
   const pills = [];
   if (!state.event) {
     const label = state.when === "custom" ? rangeLabel(...whenRange("custom")) : when;
-    if (state.when !== DEFAULT_WHEN) pills.push(removable(label, "Back to today", () => { state.when = DEFAULT_WHEN; update(); }));
+    if (state.when !== DEFAULT_WHEN && !["tomorrow", "weekend"].includes(state.when)) pills.push(removable(label, "Back to today", () => { state.when = DEFAULT_WHEN; update(); }));
   }
-  pills.push(...activeFilters().map(([label, drop]) => removable(label, "Remove this filter", drop)));
+  const quick = new Set(QUICK.map(([label]) => label));
+  pills.push(...activeFilters().filter(([label]) => !quick.has(label)).map(([label, drop]) => removable(label, "Remove this filter", drop)));
   $("#pills").replaceChildren(...pills);
   const regions = [...state.regions];
   const types = [...state.topics].filter((t) => t !== FOOD);
@@ -675,6 +712,7 @@ function draw() {
   filtered = base();
   items = plan(filtered);
   renderHead();
+  renderFeatured();
   $("#list").replaceChildren();
   rendered = 0;
   if (state.event) {
@@ -947,9 +985,7 @@ function shiftMonth(n) {
 
 function renderPrefs() {
   const list = [...prefs];
-  $("#pref-summary").textContent = list.length
-    ? `${list.join(", ")}.`
-    : "Pick what you're into and sort by it.";
+  $("#edit-prefs").textContent = list.length ? `Preferences: ${list.length}` : "Edit preferences";
   $("#pref-grid").replaceChildren(...data.topics.map((t) => {
     const row = document.createElement("label");
     row.className = "check";
