@@ -125,6 +125,13 @@ def check_events(page: Page, base: str, size: str, errors: list[str]) -> None:
     if "docs.google.com/forms" not in (page.locator(".feedback-link").get_attribute("href") or ""):
         errors.append(f"{where}: the header has no Feedback & requests link")
 
+    # The link format llms.txt teaches assistants: query keys, read into the filters.
+    page.goto(f"{base}/?when=all&campus=1&food=1", wait_until="networkidle")
+    page.wait_for_selector(".card >> visible=true", timeout=10_000)
+    show_filters(page)
+    if not (page.locator("#campus").is_checked() and page.locator("#food").is_checked()):
+        errors.append(f"{where}: ?campus=1&food=1 did not set the filters")
+
     page.goto(f"{base}/#when=all", wait_until="networkidle")
     show_filters(page)
     page.locator("#when .custom").click()

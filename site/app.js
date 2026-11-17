@@ -52,7 +52,8 @@ let sort = load(SORT_KEY, "time");
 /* ---------- URL state ---------- */
 
 function readHash() {
-  const p = new URLSearchParams(location.hash.slice(1));
+  // ?query and #hash both work: some chat apps drop the hash from links they render.
+  const p = new URLSearchParams(location.search.slice(1) + "&" + location.hash.slice(1));
   state.q = p.get("q") || "";
   // Links from before the redesign: "Everything" is now All, "Next 7 days" is This week.
   state.when = WHEN.some(([k]) => k === p.get("when")) ? p.get("when") : DEFAULT_WHEN;
@@ -60,6 +61,8 @@ function readHash() {
   state.to = DAY.test(p.get("to")) ? p.get("to") : "";
   state.topics = new Set((p.get("t") || "").split(",").filter(Boolean));
   state.regions = new Set((p.get("r") || "").split(",").filter(Boolean));
+  if (p.get("food") === "1") state.topics.add(FOOD);
+  if (p.get("campus") === "1") state.regions.add(CAMPUS);
   state.free = p.get("free") === "1";
   state.event = p.get("event") || "";
 }
@@ -73,11 +76,15 @@ function writeHash() {
     if (state.from) p.set("from", state.from);
     if (state.to) p.set("to", state.to);
   }
-  if (state.topics.size) p.set("t", [...state.topics].join(","));
-  if (state.regions.size) p.set("r", [...state.regions].join(","));
+  const topics = [...state.topics].filter((t) => t !== FOOD);
+  const regions = [...state.regions].filter((r) => r !== CAMPUS);
+  if (topics.length) p.set("t", topics.join(","));
+  if (regions.length) p.set("r", regions.join(","));
+  if (state.topics.has(FOOD)) p.set("food", "1");
+  if (state.regions.has(CAMPUS)) p.set("campus", "1");
   if (state.free) p.set("free", "1");
   const h = p.toString();
-  history.replaceState(null, "", h ? `#${h}` : location.pathname + location.search);
+  history.replaceState(null, "", location.pathname + (h ? `#${h}` : ""));
 }
 
 /* ---------- Filtering ---------- */
