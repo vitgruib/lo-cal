@@ -510,21 +510,9 @@ function activeFilters() {
 }
 
 function renderPills() {
-  const when = WHEN.find(([k]) => k === state.when)[1];
-  const pills = [];
-  if (!state.event) {
-    const label = state.when === "custom" ? rangeLabel(...whenRange("custom")) : when;
-    if (state.when !== DEFAULT_WHEN && !["tomorrow", "weekend"].includes(state.when)) pills.push(removable(label, "Back to today", () => { state.when = DEFAULT_WHEN; update(); }));
-  }
   const quick = new Set(QUICK.map(([label]) => label));
-  pills.push(...activeFilters().filter(([label]) => !quick.has(label)).map(([label, drop]) => removable(label, "Remove this filter", drop)));
+  const pills = [...activeFilters().filter(([label]) => !quick.has(label)).map(([label, drop]) => removable(label, "Remove this filter", drop))];
   $("#pills").replaceChildren(...pills);
-  const regions = [...state.regions];
-  const types = [...state.topics].filter((t) => t !== FOOD);
-  $("#scope").textContent = !pills.length ? "" : [
-    regions.length ? "" : "Anywhere",
-    types.length ? "" : "All categories",
-  ].filter(Boolean).join(" · ");
 }
 
 function toggle(set, v) {
@@ -557,31 +545,6 @@ function renderHead() {
   $("#view-title").textContent = title;
   $("#view-date").textContent = date;
   $("#count").textContent = plural(filtered.length, "event");
-  // Arrows step by the length of what's shown: a day at a time, a week at a time.
-  const stepping = !state.event && state.when !== "all" && to !== "9999";
-  $("#prev").hidden = $("#next").hidden = !stepping;
-  $("#prev").disabled = from <= today;
-}
-
-function step(dir) {
-  const [from, to] = whenRange(state.when);
-  const len = daysBetween(from, to) + 1;
-  // A weekend steps to the next weekend, not to the days right after it.
-  const by = len >= 2 && len <= 3 && keyDate(to).getUTCDay() === 0 ? 7 : len;
-  const today = dayKey.format(new Date());
-  let a = addDays(from, dir * by), b = addDays(to, dir * by);
-  if (a < today) [a, b] = [today, addDays(today, len - 1)];
-  const named = ["today", "tomorrow", "weekend", "week"].find((k) => {
-    const [x, y] = whenRange(k);
-    return x === a && y === b;
-  });
-  if (named) state.when = named;
-  else Object.assign(state, { when: "custom", from: a, to: b });
-  update(dir > 0 ? "next" : "prev");
-}
-
-function tick() {
-  $("#clock").textContent = `${fmtTime.format(new Date())} · Pacific`;
 }
 
 /* ---------- List ---------- */
@@ -674,13 +637,13 @@ function renderMore() {
   $("#list").append(frag);
 }
 
-// Filter changes reflow the list in place; day steps ("next"/"prev") turn it like a page.
-function update(kind = "reflow") {
+// Filter changes reflow the list in place.
+function update() {
   const root = document.documentElement;
   // Transition snapshots paint above everything, an open dialog included.
   if (!document.startViewTransition || !started || document.querySelector("dialog[open]")
       || matchMedia("(prefers-reduced-motion: reduce)").matches) return draw();
-  root.dataset.vt = kind;
+  root.dataset.vt = "reflow";
   document.startViewTransition(draw).finished.finally(() => delete root.dataset.vt);
 }
 
@@ -1050,8 +1013,6 @@ async function boot() {
     state.topics.clear(); state.regions.clear();
     update();
   };
-  $("#prev").onclick = () => step(-1);
-  $("#next").onclick = () => step(1);
   $("#open-filters").onclick = () => setDrawer(true);
   $("#side-close").onclick = $("#scrim").onclick = () => setDrawer(false);
   $("#edit-prefs").onclick = () => $("#pref-dlg").showModal();
@@ -1093,8 +1054,6 @@ async function boot() {
     }
     setTimeout(() => { btn.textContent = "Copy link"; }, 1800);
   };
-  tick();
-  setInterval(tick, 30_000);
 
   try {
     const res = await fetch("data/events.json", { cache: "no-cache" });
