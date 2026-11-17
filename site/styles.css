@@ -173,7 +173,7 @@ svg { flex: none; }
 .clock { font-size: 11.5px; color: var(--muted); margin-right: 6px; white-space: nowrap; }
 .filters-btn { display: none; padding: 8px 12px; }
 .side-head svg, .filters-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
-.quick { display: flex; gap: 6px; flex-wrap: wrap; margin: 16px 0 0; }
+.quick { display: none; gap: 6px; flex-wrap: wrap; margin: 16px 0 0; }
 .qf { font: 500 13px/1 var(--body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 8px 13px; cursor: pointer; transition: background .15s, border-color .15s, transform .1s; }
 .qf:hover { border-color: var(--muted); }
 .qf[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
@@ -336,6 +336,7 @@ svg { flex: none; }
   .side-head .link { margin-left: auto; margin-right: 8px; }
   .scrim { display: block; position: fixed; inset: 0; z-index: 29; background: rgb(14 19 33 / 35%); }
   .filters-btn { display: inline-flex; }
+  .quick { display: flex; }
   .clock { display: none; }
 }
 @media (max-width: 600px) {
@@ -355,7 +356,7 @@ svg { flex: none; }
   .card { grid-template-columns: 76px minmax(0, 1fr); gap: 0 10px; padding: 14px 2px 14px 10px; }
   .time { font-size: 13px; }
   .thumb { display: none; }
-      .quick { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: -16px; padding-right: 16px; }
+  .quick { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: -16px; padding-right: 16px; }
   .qf { flex: none; }
   .card .actions, .card.row .actions { grid-column: 2; grid-row: auto; flex-wrap: wrap; gap: 4px 16px; margin-top: 10px; }
   .calbtn, .flag, .share { height: 30px; }

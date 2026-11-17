@@ -13,11 +13,10 @@ const TOPIC_EMOJI = {
   "Social": "🎉", "Arts & Music": "🎨", "Sports & Wellness": "🏃", "Community": "🤝",
   "Free food": "🍕",
 };
-// A cost filter beside "Free admission", not an event type: it narrows whatever types are picked.
+// A cost filter beside "Free to attend", not an event type: it narrows whatever types are picked.
 const FOOD = "Free food";
 // "On campus only" picks this location on its own; the Where menu lists the rest.
 const CAMPUS = "Campus";
-const STATUS = { now: "Happening now", soon: "Still to come", done: "Already finished" };
 const PREFS_KEY = "lo-cal-prefs";
 const SORT_KEY = "lo-cal-sort";
 
@@ -33,7 +32,7 @@ const fmtMonth = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "lon
 const hourOf = new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "numeric", hourCycle: "h23" });
 
 let data = { events: [], sources: [], topics: [], regions: [] };
-let state = { q: "", when: DEFAULT_WHEN, from: "", to: "", topics: new Set(), regions: new Set(), free: false, status: "", event: "" };
+let state = { q: "", when: DEFAULT_WHEN, from: "", to: "", topics: new Set(), regions: new Set(), free: false, event: "" };
 let filtered = [];
 let items = [];
 let rendered = 0;
@@ -62,7 +61,6 @@ function readHash() {
   state.topics = new Set((p.get("t") || "").split(",").filter(Boolean));
   state.regions = new Set((p.get("r") || "").split(",").filter(Boolean));
   state.free = p.get("free") === "1";
-  state.status = STATUS[p.get("status")] ? p.get("status") : "";
   state.event = p.get("event") || "";
 }
 
@@ -78,7 +76,6 @@ function writeHash() {
   if (state.topics.size) p.set("t", [...state.topics].join(","));
   if (state.regions.size) p.set("r", [...state.regions].join(","));
   if (state.free) p.set("free", "1");
-  if (state.status) p.set("status", state.status);
   const h = p.toString();
   history.replaceState(null, "", h ? `#${h}` : location.pathname + location.search);
 }
@@ -148,7 +145,6 @@ function base(skip, wide) {
     // Ended events only count on their own day, folded into "Earlier today".
     (statusOf(e, now) !== "done" || (e._endDay || e._day) === today) &&
     matchesWhen(e, range) &&
-    (skip === "status" || !state.status || statusOf(e, now) === state.status) &&
     (!evening || (!e.all_day && e._hour >= EVENING && e._day >= range[0])) &&
     q.terms.every((t) => termMatches(e, t)) &&
     (!free || e.free === true) &&
@@ -471,8 +467,6 @@ function renderControls() {
 
   $("#free").checked = state.free;
   $("#food").checked = state.topics.has(FOOD);
-  $("#event-status").value = state.status;
-  $("#event-status").parentElement.classList.toggle("on", !!state.status);
   const n = activeFilters().length;
   $("#filters-n").textContent = n;
   $("#filters-n").hidden = !n;
@@ -483,8 +477,7 @@ function renderControls() {
 
 // One-tap versions of the filters people use most; the full set stays in the sidebar.
 const QUICK = [
-  ["🍴 Free food", () => state.topics.has(FOOD), () => toggle(state.topics, FOOD)],
-  ["Free admission", () => state.free, () => { state.free = !state.free; update(); }],
+  ["🍕 Free food", () => state.topics.has(FOOD), () => toggle(state.topics, FOOD)],
   ["📍 On campus", () => state.regions.has(CAMPUS), () => toggle(state.regions, CAMPUS)],
   ["Tomorrow", () => state.when === "tomorrow", () => { state.when = state.when === "tomorrow" ? DEFAULT_WHEN : "tomorrow"; update(); }],
   ["This weekend", () => state.when === "weekend", () => { state.when = state.when === "weekend" ? DEFAULT_WHEN : "weekend"; update(); }],
@@ -504,9 +497,8 @@ function activeFilters() {
   if (state.regions.has(CAMPUS)) out.push(["📍 On campus", () => toggle(state.regions, CAMPUS)]);
   for (const r of state.regions) if (r !== CAMPUS) out.push([`📍 ${r}`, () => toggle(state.regions, r)]);
   for (const t of state.topics) if (t !== FOOD) out.push([`${TOPIC_EMOJI[t] || ""} ${t}`.trim(), () => toggle(state.topics, t)]);
-  if (state.free) out.push(["Free admission", () => { state.free = false; update(); }]);
-  if (state.topics.has(FOOD)) out.push(["🍴 Free food", () => toggle(state.topics, FOOD)]);
-  if (state.status) out.push([STATUS[state.status], () => { state.status = ""; update(); }]);
+  if (state.free) out.push(["Free to attend", () => { state.free = false; update(); }]);
+  if (state.topics.has(FOOD)) out.push(["🍕 Free food", () => toggle(state.topics, FOOD)]);
   return out;
 }
 
@@ -782,7 +774,7 @@ function card(e, row = false) {
     whereEl.append(map);
   }
   if (row) {
-    if (e.free === true) at.push("Free admission");
+    if (e.free === true) at.push("Free to attend");
     if (e._endDay && e._endDay > e._day) at.push(`Through ${fmtDate.format(new Date(e._end - 1))}`);
   }
   const rest = at.filter((x) => x && x !== place).join(" · ");
@@ -807,8 +799,8 @@ function card(e, row = false) {
   const add = (text, cls = "") => badges.append(Object.assign(document.createElement("span"), { className: `badge ${cls}`, textContent: text }));
   const topics = e.tags?.filter((t) => t !== FOOD).slice(0, 2) || [];
   topics.forEach((t) => add(t));
-  if (e.free === true) add("Free admission", "free");
-  if (e.tags?.includes(FOOD)) add("🍴 Free food", "food");
+  if (e.free === true) add("Free to attend", "free");
+  if (e.tags?.includes(FOOD)) add("🍕 Free food", "food");
   (e.access || []).filter((x) => !/^free$/i.test(x)).forEach((x) => add(x, "free"));
   if (e.repeats) add(`Repeats · ${e.repeats} dates`);
   // "via" the host and every place it's listed, each linking there.
@@ -1041,14 +1033,13 @@ async function boot() {
     if (on) state.regions.add(CAMPUS);
     update();
   };
-  $("#event-status").onchange = (ev) => { state.status = ev.target.value; update(); };
   $("#sort").value = sort;
   $("#sort").onchange = (ev) => {
     if (ev.target.value === "prefs" && !prefs.size) $("#pref-dlg").showModal();
     setSort(ev.target.value);
   };
   $("#reset").onclick = () => {
-    Object.assign(state, { event: "", when: DEFAULT_WHEN, from: "", to: "", free: false, status: "" });
+    Object.assign(state, { event: "", when: DEFAULT_WHEN, from: "", to: "", free: false });
     state.topics.clear(); state.regions.clear();
     update();
   };
