@@ -20,7 +20,6 @@ import httpx
 from . import http
 from .dedupe import collapse_repeats, dedupe
 from .enrich import REGIONS, TOPICS, enrich
-from .ics import write_feeds
 from .llms import write_json_slices, write_llms_full, write_llms_slices
 from .models import Event
 from .pages import write_pages
@@ -180,7 +179,6 @@ def main(argv: list[str]) -> None:
         "topic_words": TOPICS,
         "events": [e.to_json() for e in final],
     }, ensure_ascii=False, separators=(",", ":")))
-    write_feeds(final, list(TOPICS), EVENTS.parent / "cal", now, REGIONS)
     owner, name = config["repo"].split("/")
     site_url = f"https://{owner}.github.io/{name}/"
     # An assistant asked what's on should never offer something that's over.

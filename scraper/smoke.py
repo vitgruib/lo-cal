@@ -121,12 +121,9 @@ def check_events(page: Page, base: str, size: str, errors: list[str]) -> None:
     if page.locator("#side-close").is_visible():
         page.locator("#side-close").click()
 
-    # My calendar offers a subscription to the feed matching the filters.
-    page.locator("#mycal").click()
-    google = page.locator("#cal-google").get_attribute("href") or ""
-    if not page.locator("#cal-dlg[open]").count() or "webcal" not in google:
-        errors.append(f"{where}: My calendar does not offer a feed to subscribe to")
-    page.keyboard.press("Escape")
+    # Feedback and requests are one click away from the header.
+    if "docs.google.com/forms" not in (page.locator(".feedback-link").get_attribute("href") or ""):
+        errors.append(f"{where}: the header has no Feedback & requests link")
 
     page.goto(f"{base}/#when=all", wait_until="networkidle")
     show_filters(page)

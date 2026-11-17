@@ -34,6 +34,9 @@
         <a href="about.html">How it works</a>
         <a href="stats.html">Stats</a>
       </nav>
+      <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLSeltgT0d8IheCnsmDhdECZ347hpWNquj5A_GO-cifRQ0kldig/viewform" target="_blank" rel="noopener" title="Suggest a club calendar, add or report an event, or send feedback">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H9l-4 4z"/><path d="M9 9h6M9 12h4"/></svg><span class="long">Feedback &amp; requests</span><span class="short">Feedback</span>
+      </a>
     </div>
   </header>
 
@@ -46,9 +49,6 @@
         <kbd class="kbd" aria-hidden="true">⌘ K</kbd>
         <button class="btn navy" type="submit">Search</button>
       </form>
-      <button class="btn gold" id="mycal" type="button">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4m7-4v4"/></svg>My calendar
-      </button>
     </div>
     <div class="wrap"><div class="qchips" id="qchips" aria-label="Filters read from your search" hidden></div></div>
   </div>
@@ -139,12 +139,6 @@
       <div id="list" aria-live="polite"></div>
       <div id="sentinel"></div>
 
-      <section class="cal-banner">
-        <span class="banner-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4m7-4v4"/></svg></span>
-        <div><b>Get these in your calendar</b><span>Subscribe to your filters and new events show up on their own. Each event's Calendar button adds just that one.</span></div>
-        <button class="btn ghost" id="setup-cal" type="button">Set up my calendar</button>
-      </section>
-
       <footer class="footer">
         <p>Event type, location, Free, and Getting in labels are automatically inferred and may be wrong. Check the original event page before heading out. <a href="about.html#tags">The rules</a></p>
         <p class="foot-row"><b>Open source.</b> <a class="arrow-out" href="data/events.json">data/events.json</a> <span>Public, no key needed</span><span class="updated" id="updated"></span></p>
@@ -160,18 +154,6 @@
     <div class="cal-grid" id="cal-grid" role="grid"></div>
     <div class="range-sum"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4m7-4v4"/></svg><div><b id="range-text">Pick a start date</b><span id="range-days"></span></div></div>
     <div class="modal-foot"><button class="link" type="button" id="clear-dates">Clear dates</button><button class="btn gold" type="button" id="apply-dates">Apply dates</button></div>
-  </dialog>
-
-  <dialog class="modal" id="cal-dlg" aria-labelledby="cal-title">
-    <div class="modal-head"><h2 id="cal-title">Subscribe in your calendar</h2><button class="iconbtn plain" type="button" data-close aria-label="Close">✕</button></div>
-    <p class="modal-sub">Subscribe to the events matching your filters. New ones show up in your calendar on their own.</p>
-    <div class="range-sum"><div><b>Your feed</b><span id="feed-sum"></span></div></div>
-    <p class="feed-note" id="feed-note" hidden></p>
-    <div class="modal-actions">
-      <a class="btn gold" id="cal-google" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4m7-4v4"/></svg><span>Connect Google Calendar</span></a>
-      <a class="btn ghost" id="cal-other"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span>Apple, Outlook, or another calendar</span></a>
-    </div>
-    <p class="privacy" id="cal-privacy"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span></span></p>
   </dialog>
 
   <dialog class="modal" id="pref-dlg" aria-labelledby="pref-title">

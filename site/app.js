@@ -889,46 +889,6 @@ function downloadIcs(events, name) {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
-/* ---------- My calendar ---------- */
-
-const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-
-// The build writes one feed per filter combination (scraper/ics.py): f/<type>.<location>.<cost>.ics.
-function feedFor() {
-  const types = [...state.topics].filter((t) => t !== FOOD);
-  const regions = [...state.regions];
-  if (types.length > 1 || regions.length > 1) return null;
-  const cost = state.free && state.topics.has(FOOD) ? "free-food" : state.free ? "free" : state.topics.has(FOOD) ? "food" : "any";
-  const name = [types[0], regions[0] === CAMPUS ? "On campus" : regions[0],
-    { any: "", free: "Free admission", food: "Free food", "free-food": "Free admission + free food" }[cost]].filter(Boolean).join(" · ");
-  return { file: `data/cal/f/${types[0] ? slug(types[0]) : "all"}.${regions[0] ? slug(regions[0]) : "all"}.${cost}.ics`, name: name || "Every Berkeley event" };
-}
-
-function renderCalDialog() {
-  const feed = feedFor();
-  $("#feed-sum").textContent = feed ? feed.name : "Pick at most one event type and one location in the filters.";
-  const google = $("#cal-google"), other = $("#cal-other"), note = $("#feed-note");
-  note.hidden = true;
-  google.classList.toggle("disabled", !feed);
-  other.classList.toggle("disabled", !feed);
-  if (feed) {
-    const url = new URL(feed.file, location.href).href;
-    const webcal = url.replace(/^https?:/, "webcal:");
-    google.href = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(webcal)}`;
-    other.href = webcal;
-    if (state.q || state.when !== DEFAULT_WHEN || state.status) {
-      note.textContent = "Search words, dates and status aren't part of a feed: it holds every upcoming event that matches.";
-      note.hidden = false;
-    }
-  }
-  $("#cal-privacy span").textContent = "Feeds are public files, the same for everyone. Subscribing sends nothing about you, and your calendar app checks for new events every few hours.";
-}
-
-function openCal() {
-  renderCalDialog();
-  $("#cal-dlg").showModal();
-}
-
 /* ---------- Custom dates ---------- */
 
 let pick = { a: "", b: "", month: "" };
@@ -1079,7 +1039,6 @@ async function boot() {
   $("#next").onclick = () => step(1);
   $("#open-filters").onclick = () => setDrawer(true);
   $("#side-close").onclick = $("#scrim").onclick = () => setDrawer(false);
-  $("#mycal").onclick = $("#setup-cal").onclick = openCal;
   $("#edit-prefs").onclick = () => $("#pref-dlg").showModal();
   $("#pref-clear").onclick = () => {
     prefs.clear();

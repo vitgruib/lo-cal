@@ -15,7 +15,6 @@ Tags (`tags`), area (`region`), `free` and `access` ("getting in") come from det
 - `data/json/`: the same slices as JSON (`today.json`, `tomorrow.json`, `weekend.json`, `days/YYYY-MM-DD.json`, `topics/<topic>.json`), each `{generated_at, title, events}` with the `events.json` fields below except `image`, `source_tags` and `source_access`. Use these when you parse rather than read.
 - [llms-full.txt](https://vitgruib.github.io/lo-cal/data/llms-full.txt): every upcoming event in one file, one line each, grouped by day. It is large (about 500 KB), so many assistants' web tools cut it off; prefer the slices above.
 - [events.json](https://vitgruib.github.io/lo-cal/data/events.json): the same events as JSON, plus the list of sources and their health.
-- [Calendar feeds](https://vitgruib.github.io/lo-cal/data/cal/all.ics): `data/cal/all.ics` and one per type, e.g. `free-food.ics`, `hackathons.ics`, `ai-tech.ics`, `talks.ics`, `social.ics`, `career.ics`, `startups.ics`, `arts-music.ics`, `sports-wellness.ics`, `community.ics`.
 
 ## MCP server
 

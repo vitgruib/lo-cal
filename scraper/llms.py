@@ -1,16 +1,20 @@
 """Upcoming events as plain text for AI assistants: everything in llms-full.txt, and small slices\n(today, tomorrow, the weekend, each day, each topic) under data/llms/."""
 
 import json
+import re
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from .enrich import TOPICS
-from .ics import slug
 from .models import Event
 from .reports import describe
 
 PACIFIC = ZoneInfo("America/Los_Angeles")
+
+
+def slug(topic: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", topic.lower()).strip("-")
 
 
 def time_range(e: Event) -> str:

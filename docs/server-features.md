@@ -19,8 +19,8 @@ backend (see the "Backend server" section of issue #4). This file is not linked 
   saves stored on the server, so a calendar app subscribes once and each new save shows up on its
   next poll.
 - Today the site has no Save: it was removed on 2026-11-16, since a browser-only list did less
-  than each event's Calendar button. It offers self-updating feeds built from filters, which work without a server because every filter combination is
-  pre-generated (`site/data/cal/f/`).
+  than each event's Calendar button. Filter feeds
+  were removed the same day: the broad ones put hundreds of events in a calendar.
 - The privacy note from the mockup applies: the feed link is private, so share it only with
   people you trust.
 
