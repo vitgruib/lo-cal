@@ -32,7 +32,6 @@
       <nav class="nav" aria-label="Site">
         <a href="./">Events</a>
         <a href="about.html" aria-current="page">How it works</a>
-        <a href="stats.html">Stats</a>
       </nav>
       <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLSeltgT0d8IheCnsmDhdECZ347hpWNquj5A_GO-cifRQ0kldig/viewform" target="_blank" rel="noopener" title="Suggest a club calendar, add or report an event, or send feedback">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H9l-4 4z"/><path d="M9 9h6M9 12h4"/></svg><span class="long">Feedback &amp; requests</span><span class="short">Feedback</span>
@@ -206,42 +205,13 @@
       final word.</p>
 
     <h3>Location</h3>
-    <p>The first rule that fits decides:</p>
-    <ol>
-      <li>Marked online, with no campus room named: <b>Online</b>. A hybrid event in a campus room
-        is Campus.</li>
-      <li>A concert at one of the big venues above, outside the Bay Area: <b>Sacramento</b>,
-        <b>Los Angeles</b> or <b>San Diego</b>. These are the only events listed that far away.</li>
-      <li><b>Campus</b> means on UC Berkeley's own land. That's its map coordinates inside the
-        university's boundary as <a href="https://www.openstreetmap.org/relation/2814221">OpenStreetMap</a> (© OpenStreetMap contributors, ODbL)
-        draws it (the main campus and hill, Clark Kerr, the residence halls, BAMPFA, Berkeley Way
-        West, ...). Or, for a listing with no coordinates, a venue that names a campus building
-        ("241 Giannini Hall", "Wheeler 124", "MLK Student Union"), a Haas room on the campus
-        calendar ("C250"), or UC Berkeley's own ZIP code, 94720. Downtown and Southside are
-        <b>Berkeley</b>, however close: The Freight, Shattuck Ave and Telegraph Ave are not on campus.</li>
-      <li>Has map coordinates: within 4 km of campus, or the city is Berkeley, is <b>Berkeley</b>.
-        More than 110 km away is not listed.</li>
-      <li>Has a city (the listing's own city field, matched exactly, ignoring case):
-        <ul>
-          <li>Berkeley is <b>Berkeley</b>.</li>
-          <li>These 25 are <b>East Bay</b>: Alameda, Albany, Castro Valley, Concord, Danville,
-            Dublin, El Cerrito, El Sobrante, Emeryville, Fremont, Hayward, Kensington, Lafayette,
-            Livermore, Moraga, Oakland, Orinda, Piedmont, Pleasant Hill, Pleasanton, Richmond,
-            San Leandro, San Ramon, Union City and Walnut Creek.</li>
-          <li>San Francisco (or "SF") is <b>San Francisco</b>.</li>
-          <li>These 22 are <b>Peninsula &amp; South Bay</b>: Belmont, Burlingame, Cupertino, Daly
-            City, Foster City, Half Moon Bay, Hillsborough, Los Altos, Menlo Park, Millbrae,
-            Milpitas, Mountain View, Palo Alto, Redwood City, San Bruno, San Carlos, San Jose,
-            San Mateo, Santa Clara, South San Francisco, Stanford and Sunnyvale.</li>
-          <li>Any other city falls through to the next rules, so an event in, say, Marin or
-            Vallejo is placed by its coordinates.</li>
-        </ul></li>
-      <li>Coordinates but an unknown city: west of longitude −122.36 between latitudes 37.70 and 37.82
-        is San Francisco; north of 37.95 is <b>North Bay</b>; south of 37.70 is Peninsula &amp; South
-        Bay; anything else is East Bay.</li>
-      <li>No location at all: <b>Berkeley</b> if it came from a club or campus calendar, a mailing list
-        or Instagram, since those are local. From anywhere else it is not listed.</li>
-    </ol>
+    <p><b>Campus</b> means on UC Berkeley's own land: map coordinates inside the university's
+      boundary as <a href="https://www.openstreetmap.org/relation/2814221">OpenStreetMap</a>
+      (© OpenStreetMap contributors, ODbL) draws it, or a venue naming a campus building.
+      Downtown and Southside are <b>Berkeley</b>. Everything else is placed by its city or
+      coordinates into East Bay, San Francisco, Peninsula &amp; South Bay or North Bay; online
+      events are <b>Online</b>. The exact rules and city lists are in
+      <a href="https://github.com/vitgruib/lo-cal/blob/main/scraper/enrich.py">enrich.py</a>.</p>
 
     <h3>Auto tagging</h3>
     <p>The title, description, host and any category the source gives (such as the campus
@@ -255,17 +225,8 @@
     </div>
 
     <h3 id="getting-in">Getting in</h3>
-    <p>Each card says how to get in when the source or the description tells us. Luma and Partiful
-      say whether to RSVP, whether the host approves guests, whether it's sold out or has a
-      waitlist, and the ticket price; the campus calendar gives the cost. The title and
-      description are also read for: RSVP required, registration required, open to everyone, no
-      RSVP needed, Berkeley students only, members only, invite only, 21+, 18+, bring your Cal ID,
-      and first come, first served. When a platform takes RSVPs, wording like "drop in" doesn't
-      override it. If a card lists nothing, neither the source nor the description said; check the event's page.</p>
-
-    <h3>Source</h3>
-    <p>Where the event was found. The same event found in several places is merged into one, and the
-      card shows every source.</p>
+    <p>RSVP, approval, waitlist, price and limits like "21+" or "members only", from the source
+      or the description. A card with nothing listed means neither said.</p>
 
     <h2 id="code">Open data and code</h2>
     <p>Every event on the site is in one public file,

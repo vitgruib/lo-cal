@@ -498,24 +498,6 @@ function renderQuick() {
   }));
 }
 
-// The next few events with a picture, big, on the plain Today view only.
-function renderFeatured() {
-  const box = $("#featured");
-  const now = Date.now();
-  const plain = state.when === DEFAULT_WHEN && !state.q && !state.event && !activeFilters().length;
-  const next = plain ? filtered.filter((e) => e.image && e._start > now).sort((a, b) => a._start - b._start).slice(0, 3) : [];
-  box.hidden = next.length < 3;
-  box.replaceChildren(...next.map((e) => {
-    const a = Object.assign(document.createElement("a"), { className: "feat", href: e.url, target: "_blank", rel: "noopener" });
-    a.innerHTML = `<img alt="" loading="lazy"><span class="feat-when"></span><b></b><span class="feat-where"></span>`;
-    a.querySelector("img").src = e.image;
-    a.querySelector(".feat-when").textContent = fmtTime.format(new Date(e._start));
-    a.querySelector("b").textContent = e.title;
-    a.querySelector(".feat-where").textContent = e.venue || e.region || "";
-    return a;
-  }));
-}
-
 // Every filter in use, each with a way to drop it: the pills above the list and the Reset count.
 function activeFilters() {
   const out = [];
@@ -712,7 +694,6 @@ function draw() {
   filtered = base();
   items = plan(filtered);
   renderHead();
-  renderFeatured();
   $("#list").replaceChildren();
   rendered = 0;
   if (state.event) {

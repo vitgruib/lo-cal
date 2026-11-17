@@ -31,5 +31,4 @@ Each event: `id`, `title`, `start` and `end` (ISO 8601 with offset), `all_day`, 
 - [Events](https://vitgruib.github.io/lo-cal/): filters live in the URL hash, e.g. `#when=today&t=Free%20food&r=Campus`. Keys: `q` search text (words like "tonight", "free food", "sf" become filters), `when` (today, tomorrow, weekend, week, all, custom with `from`/`to` as YYYY-MM-DD), `t` topics, `r` regions, `src` source ids, `free=1`, `event=<id>` one event.
 - [How it works](https://vitgruib.github.io/lo-cal/about.html): every source and every tagging rule.
 - Event pages: `e/<id>.html`, one per event, listed in [sitemap.xml](https://vitgruib.github.io/lo-cal/sitemap.xml).
-- [Stats](https://vitgruib.github.io/lo-cal/stats.html): event counts and source health.
 - [Code](https://github.com/vitgruib/lo-cal): open source.
