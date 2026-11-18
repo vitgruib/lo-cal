@@ -11,6 +11,28 @@ Open data: the whole list is one public file, [`data/events.json`](https://vitgr
 
 Topic tags, regions, Free and Getting in come from deterministic keyword rules: useful for filtering, not ground truth.
 
+## Core tenets
+
+- **Open source, open data.** Every scraper, rule and source is in this repo. Every event is in
+  one public file, [`events.json`](https://vitgruib.github.io/lo-cal/data/events.json), with no
+  key and no login: read it, scrape it, mirror it or build on it.
+- **Transparent.** The [About page](https://vitgruib.github.io/lo-cal/about.html) lists every
+  source and every tagging rule. Each event card shows every place it came from, and events are
+  sorted by time only, with no ranking or promoted listings.
+- **Made for LLMs.** Anyone can ask their own ChatGPT or Claude "what's on at Berkeley tonight?"
+  and get real listings: [`llms.txt`](https://vitgruib.github.io/lo-cal/llms.txt), plain-text
+  and JSON slices by day and topic, and an [MCP server](mcp-server/). Tagging uses fixed keyword
+  rules, not an LLM, so it is cheap, repeatable and checkable.
+- **Collaborative.** Anyone can suggest a calendar, add or report an event through one Google
+  Form, or open a pull request to `sources.toml`. Reports show publicly on the event, marked
+  unverified. Other projects are welcome to use the data or send theirs as a feed, which takes
+  one `sources.toml` entry.
+- **Free and private.** No accounts, no ads, no tracking. Everything runs on free GitHub Actions
+  and Pages; Instagram is the only paid source, under a monthly cap.
+- **Built to outlast its maintainers.** No server, no database and no manual step: the published
+  site is the database, broken sources fall back to their last good events and open an issue,
+  and nothing ships unless the smoke test passes. Anyone can fork it and run it.
+
 ## Sources
 
 | Source | How | Needs |
