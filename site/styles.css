@@ -274,6 +274,14 @@ svg { flex: none; }
 .shared { display: flex; align-items: center; gap: 10px; margin: 18px 0 0; color: var(--muted); font-size: 14px; }
 
 
+/* Today's events as plain HTML (scraper/pages.py), for crawlers; app.js replaces them. */
+.static-list { list-style: none; padding: 0; margin: 18px 0; }
+.static-list li { padding: 8px 0; border-bottom: 1px solid var(--faint); }
+.static-list .t { display: block; font-size: 13px; color: var(--muted); }
+.static-list a, .static-more a { color: var(--title); text-decoration: none; font-weight: 500; }
+.static-list a:hover, .static-more a:hover { text-decoration: underline; }
+.static-list .p { color: var(--muted); font-size: 14px; }
+.static-more { font-size: 14px; color: var(--muted); }
 .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
 .empty strong { display: block; font: 500 26px var(--serif); color: var(--ink); margin-bottom: 6px; }
 .widen { margin-top: 12px; font: 600 13.5px var(--body); color: #fff; background: var(--navy); border: 0; border-radius: 8px; padding: 9px 16px; cursor: pointer; }

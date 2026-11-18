@@ -1,17 +1,21 @@
-"""One static page per event at e/<id>.html, plus sitemap.xml.
+"""One static page per event at e/<id>.html, a page per day and topic at on/<slice>.html,
+today's events written into index.html, plus sitemap.xml.
 
 Chat apps and search engines read a page's HTML without running its script, and never see
 the part of a link after '#'. A real page per event is what gives a shared link its preview
-card (Open Graph tags) and lets Google list the event (schema.org Event data)."""
+card (Open Graph tags) and lets Google list the event (schema.org Event data). The day and topic
+pages answer searches like "free food at Berkeley today" the same way, and the copy of today's
+list in index.html is what a crawler that doesn't run app.js sees on the home page."""
 
 import json
+import re
 from datetime import datetime
 from html import escape
 from pathlib import Path
 from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
 
-from .llms import time_range
+from .llms import slices, time_range
 from .models import Event
 from .reports import describe
 
@@ -31,7 +35,7 @@ def _summary(e: Event) -> str:
     return " · ".join(x for x in [f"{day:%a %b %-d}, {time_range(e)}", place] if x)
 
 
-def _json_ld(e: Event, page: str) -> str:
+def _event_ld(e: Event, page: str) -> dict:
     place = ({"@type": "VirtualLocation", "url": e.url} if e.online and not e.venue else
              {"@type": "Place", "name": e.venue or e.address or e.city or "Berkeley",
               "address": e.address or e.city or "Berkeley, CA"})
@@ -48,6 +52,10 @@ def _json_ld(e: Event, page: str) -> str:
         data["organizer"] = {"@type": "Organization", "name": e.host}
     if e.free:
         data["isAccessibleForFree"] = True
+    return data
+
+
+def _ld(data: dict) -> str:
     # Titles and descriptions come from strangers: "</script>" in one must not end the block.
     return json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")
 
@@ -59,6 +67,24 @@ def _gcal(e: Event) -> str:
         "action": "TEMPLATE", "text": e.title, "details": e.url,
         "dates": f"{e.start.astimezone(ZoneInfo('UTC')):{fmt}}/{end.astimezone(ZoneInfo('UTC')):{fmt}}",
         "location": e.address or e.venue or ""})
+
+
+HEADER = """  <header class="masthead">
+      <div class="wrap mast">
+        <a class="logo" href="../" aria-label="Lo-Cal home">
+          <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4m7-4v4"/></svg></span>
+          <span class="logo-word">Lo-<span>Cal</span></span>
+        </a>
+        <nav class="nav" aria-label="Site">
+          <a href="../">Events</a>
+          <a href="../about.html">How it works</a>
+        </nav>
+      <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLSeltgT0d8IheCnsmDhdECZ347hpWNquj5A_GO-cifRQ0kldig/viewform" target="_blank" rel="noopener" title="Suggest a club calendar, add or report an event, or send feedback">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H9l-4 4z"/><path d="M9 9h6M9 12h4"/></svg><span class="long">Feedback &amp; requests</span><span class="short">Feedback</span>
+      </a>
+      </div>
+    </header>
+"""
 
 
 def event_page(e: Event, site_url: str) -> str:
@@ -97,25 +123,10 @@ def event_page(e: Event, site_url: str) -> str:
   <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="../event.css">
-  <script type="application/ld+json">{_json_ld(e, page)}</script>
+  <script type="application/ld+json">{_ld(_event_ld(e, page))}</script>
 </head>
 <body>
-  <header class="masthead">
-      <div class="wrap mast">
-        <a class="logo" href="../" aria-label="Lo-Cal home">
-          <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4m7-4v4"/></svg></span>
-          <span class="logo-word">Lo-<span>Cal</span></span>
-        </a>
-        <nav class="nav" aria-label="Site">
-          <a href="../">Events</a>
-          <a href="../about.html">How it works</a>
-        </nav>
-      <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLSeltgT0d8IheCnsmDhdECZ347hpWNquj5A_GO-cifRQ0kldig/viewform" target="_blank" rel="noopener" title="Suggest a club calendar, add or report an event, or send feedback">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H9l-4 4z"/><path d="M9 9h6M9 12h4"/></svg><span class="long">Feedback &amp; requests</span><span class="short">Feedback</span>
-      </a>
-      </div>
-    </header>
-  <main class="wrap event-page">
+{HEADER}  <main class="wrap event-page">
     <a class="back" href="../">← All events</a>
     {f'<img class="hero" src="{h(e.image)}" alt="">' if e.image else ""}
     <h1>{h(e.title)}</h1>
@@ -134,7 +145,7 @@ def event_page(e: Event, site_url: str) -> str:
 """
 
 
-def write_pages(events: list[Event], site_url: str, site: Path, now: datetime) -> None:
+def write_pages(events: list[Event], site_url: str, site: Path, now: datetime, extra: tuple[str, ...] | list[str] = ()) -> None:
     out = site / "e"
     out.mkdir(exist_ok=True)
     keep = set()
@@ -146,9 +157,86 @@ def write_pages(events: list[Event], site_url: str, site: Path, now: datetime) -
         if old.name not in keep:
             old.unlink()
     day = now.date().isoformat()
-    urls = [f"{site_url}{p}" for p in STATIC] + [f"{site_url}e/{n}" for n in sorted(keep)]
+    urls = [f"{site_url}{p}" for p in [*STATIC, *extra]] + [f"{site_url}e/{n}" for n in sorted(keep)]
     (site / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         + "".join(f"  <url><loc>{escape(u)}</loc><lastmod>{day}</lastmod></url>\n" for u in urls)
         + "</urlset>\n")
+
+
+def _list_html(events: list[Event], prefix: str) -> str:
+    """A plain list that reads without app.js: time, linked title, place."""
+    rows = []
+    for e in events:
+        place = e.venue or e.address or ("Online" if e.online else e.city or "")
+        rows.append(f'<li><span class="t">{h(f"{e.start.astimezone(PACIFIC):%a %b %-d}, {time_range(e)}")}</span> '
+                    f'<a href="{prefix}e/{e.id}.html">{h(e.title)}</a>'
+                    + (f' <span class="p">{h(place)}</span>' if place else "") + "</li>")
+    return '<ul class="static-list">\n' + "\n".join(rows) + "\n</ul>" if rows else "<p>Nothing listed.</p>"
+
+
+def _item_list(name: str, events: list[Event], site_url: str) -> str:
+    return _ld({"@context": "https://schema.org", "@type": "ItemList", "name": name,
+                "itemListElement": [{"@type": "ListItem", "position": i + 1,
+                                     "item": _event_ld(e, f"{site_url}e/{e.id}.html")}
+                                    for i, e in enumerate(events)]})
+
+
+def _nav(names: list[str], prefix: str) -> str:
+    return " · ".join(f'<a href="{prefix}on/{n}.html">{h(t)}</a>' for n, t in names)
+
+
+def collection_page(name: str, title: str, events: list[Event], site_url: str, links: str) -> str:
+    page = f"{site_url}on/{name}.html"
+    heading = f"Berkeley events: {title}"
+    blurb = f"{len(events)} events in and around UC Berkeley, from every club, department and platform."
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{h(heading)} · Lo-Cal</title>
+  <meta name="description" content="{h(blurb)}">
+  <link rel="canonical" href="{h(page)}">
+  <link rel="alternate" type="text/plain" href="../llms.txt" title="Lo-Cal for AI assistants">
+  <meta property="og:title" content="{h(heading)}">
+  <meta property="og:description" content="{h(blurb)}">
+  <meta property="og:image" content="{site_url}og.png">
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../event.css">
+  <script type="application/ld+json">{_item_list(heading, events, site_url)}</script>
+</head>
+<body>
+{HEADER}  <main class="wrap event-page">
+    <a class="back" href="../">← All events</a>
+    <h1>{h(heading)}</h1>
+    <p class="tags">{h(blurb)} Times are Pacific.</p>
+    {_list_html(events, "../")}
+    <p class="note">More: {links}</p>
+  </main>
+</body>
+</html>
+"""
+
+
+def write_collections(events: list[Event], site_url: str, site: Path, now: datetime) -> list[str]:
+    """The day and topic pages, and today's list inside index.html; returns the pages' paths."""
+    out = site / "on"
+    out.mkdir(exist_ok=True)
+    chosen = {key.rsplit("/", 1)[-1]: v for key, v in slices(events, now).items()}
+    nav = [(n, t[0].upper() + t[1:]) for n, (t, _) in chosen.items() if not n[:1].isdigit()]
+    for name, (title, evs) in chosen.items():
+        (out / f"{name}.html").write_text(collection_page(name, title, evs, site_url, _nav(nav, "../")))
+    for old in out.glob("*.html"):
+        if old.stem not in chosen:
+            old.unlink()
+    today = chosen["today"][1]
+    static = (f"<!-- static -->\n<noscript><p>Lo-Cal needs JavaScript for filters. Today's events:</p></noscript>\n"
+              f"{_list_html(today, '')}\n<p class=\"static-more\">{_nav(nav, '')}</p>\n"
+              f'<script type="application/ld+json">{_item_list("Berkeley events today", today, site_url)}</script>\n'
+              "<!-- /static -->")
+    index = site / "index.html"
+    index.write_text(re.sub(r"<!-- static -->.*?<!-- /static -->", lambda _: static, index.read_text(), flags=re.DOTALL))
+    return [f"on/{n}.html" for n in chosen]

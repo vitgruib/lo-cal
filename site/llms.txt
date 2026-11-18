@@ -28,6 +28,7 @@ Each event: `id`, `title`, `start` and `end` (ISO 8601 with offset), `all_day`, 
 
 ## Site
 
+- Pages per day and topic, for search: `https://vitgruib.github.io/lo-cal/on/today.html`, `on/tomorrow.html`, `on/weekend.html`, `on/YYYY-MM-DD.html`, and one per type such as `on/free-food.html` or `on/hackathons.html` (next 7 days).
 - [Events](https://vitgruib.github.io/lo-cal/): to send someone a filtered list, build a link like `https://vitgruib.github.io/lo-cal/?when=tomorrow&campus=1&food=1` (`#` in place of `?` works too). Keys, all optional and combinable: `when` (today, tomorrow, weekend, week, all, or custom with `from`/`to` as YYYY-MM-DD), `campus=1` on campus, `food=1` free food, `free=1` free to attend, `t` event types comma-separated (AI & Tech, Startups, Hackathons, Career, Talks, Social, Arts & Music, Sports & Wellness, Community), `r` areas comma-separated (Berkeley, East Bay, San Francisco, Peninsula & South Bay, North Bay, Online), `q` search text, `event=<id>` one event.
 - [How it works](https://vitgruib.github.io/lo-cal/about.html): every source and every tagging rule.
 - Event pages: `e/<id>.html`, one per event, listed in [sitemap.xml](https://vitgruib.github.io/lo-cal/sitemap.xml).

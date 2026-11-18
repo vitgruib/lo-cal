@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 from html.parser import HTMLParser
 
 from scraper.models import Event
-from scraper.pages import write_pages
+from scraper.pages import write_collections, write_pages
 
 NOW = datetime(2026, 10, 27, 18, tzinfo=UTC)
 SITE = "https://example.github.io/lo-cal/"
@@ -76,3 +76,16 @@ def test_pages_of_ended_events_are_removed_and_sitemap_lists_current_ones(tmp_pa
 
     assert [p.name for p in (tmp_path / "e").iterdir()] == [f"{new.id}.html"]
     assert f"{SITE}e/{new.id}.html" in sitemap and old.id not in sitemap
+
+
+def test_day_and_topic_pages_and_index_list_events_without_javascript(tmp_path):
+    (tmp_path / "index.html").write_text('<div id="list"><!-- static --><!-- /static --></div>')
+    food = ev("Pizza GBM", start=NOW + timedelta(hours=1), tags=["Free food"])
+    later = ev("Rust night", start=NOW + timedelta(days=3))
+    paths = write_collections([food, later], SITE, tmp_path, NOW)
+
+    index = (tmp_path / "index.html").read_text()
+    assert f'e/{food.id}.html">Pizza GBM' in index and "Rust night" not in index
+    topic = read(tmp_path / "on" / "free-food.html")
+    assert [i["item"]["name"] for i in json.loads(topic.ld)["itemListElement"]] == ["Pizza GBM"]
+    assert "on/today.html" in paths and "on/free-food.html" in paths

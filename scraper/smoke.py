@@ -158,6 +158,9 @@ def check_data(previous: Path | None, errors: list[str]) -> int:
     events = json.loads((SITE / "data" / "events.json").read_text())["events"]
     if not events:
         errors.append("events.json has no events")
+    # Crawlers that don't run app.js read the home page and the day and topic pages as written.
+    if "<!-- static -->\n" not in (SITE / "index.html").read_text() or not (SITE / "on" / "today.html").exists():
+        errors.append("index.html or on/today.html has no static event list")
     if previous and previous.exists():
         before = len(json.loads(previous.read_text())["events"])
         if before and len(events) < before * MIN_KEEP:

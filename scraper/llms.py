@@ -64,7 +64,7 @@ def write_llms_full(events: list[Event], site_url: str, path: Path, now: datetim
     path.write_text(_render("upcoming Berkeley events", events, site_url, now))
 
 
-def _slices(events: list[Event], now: datetime) -> dict[str, tuple[str, list[Event]]]:
+def slices(events: list[Event], now: datetime) -> dict[str, tuple[str, list[Event]]]:
     """Slice name (no extension) -> (title, events); shared by the text and JSON slices."""
     def day(e: Event) -> date:
         return e.start.astimezone(PACIFIC).date()
@@ -88,7 +88,7 @@ def _slices(events: list[Event], now: datetime) -> dict[str, tuple[str, list[Eve
 def write_llms_slices(events: list[Event], site_url: str, out: Path, now: datetime) -> None:
     """Small files an assistant can read whole in one fetch, at addresses that never change:
     llms-full.txt is too long for most assistants' web tools, which cut a page off part way."""
-    files = {f"{name}.txt": v for name, v in _slices(events, now).items()}
+    files = {f"{name}.txt": v for name, v in slices(events, now).items()}
     for sub in ("days", "topics"):
         for old in (out / sub).glob("*.txt"):
             if f"{sub}/{old.name}" not in files:
@@ -113,7 +113,7 @@ def write_json_slices(events: list[Event], out: Path, now: datetime) -> None:
     events.json itself is too big for most assistants' fetch tools. Image and the source's raw
     tags and access are left out (events.json has them): they cost a sixth of the size and tell an
     assistant nothing the rest of the record doesn't."""
-    files = {f"{name}.json": v for name, v in _slices(events, now).items()}
+    files = {f"{name}.json": v for name, v in slices(events, now).items()}
     for sub in ("days", "topics"):
         for old in (out / sub).glob("*.json"):
             if f"{sub}/{old.name}" not in files:

@@ -22,7 +22,7 @@ from .dedupe import collapse_repeats, dedupe
 from .enrich import REGIONS, TOPICS, enrich
 from .llms import write_json_slices, write_llms_full, write_llms_slices
 from .models import Event
-from .pages import write_pages
+from .pages import write_collections, write_pages
 from .registry import SOURCES
 from .reports import attach, parse_reports
 from .state import EVENTS, ROOT, Context, NotConfigured, State, now_utc
@@ -186,7 +186,8 @@ def main(argv: list[str]) -> None:
     write_llms_full(live, site_url, EVENTS.parent / "llms-full.txt", now)
     write_llms_slices(live, site_url, EVENTS.parent / "llms", now)
     write_json_slices(live, EVENTS.parent / "json", now)
-    write_pages(final, site_url, EVENTS.parent.parent, now)
+    collections = write_collections(live, site_url, EVENTS.parent.parent, now)
+    write_pages(final, site_url, EVENTS.parent.parent, now, collections)
     log.info("wrote %d events (from %d raw); http %s", len(final), len(events), http.stats)
 
 
